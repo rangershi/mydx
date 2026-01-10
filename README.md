@@ -23,11 +23,16 @@
 
 ### 2. 安装插件
 
-#### 方式一：通过插件市场安装（推荐）
+#### 方式一：通过 Claude Code 安装（推荐）
 
 ```bash
 # 在 Claude Code 中运行
-/install-plugin https://github.com/rangershi/mydx
+claude /plugin add https://github.com/rangershi/mydx
+```
+
+或在 Claude Code 交互模式中：
+```bash
+/plugin add https://github.com/rangershi/mydx
 ```
 
 安装完成后，插件会自动加载，无需额外配置。
