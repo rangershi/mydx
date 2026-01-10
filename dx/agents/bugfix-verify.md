@@ -18,7 +18,7 @@ You are a **Fix Validation Specialist** responsible for independently assessing 
 |----------------|----------|------|
 | `direct` (默认) | 直接执行 | 使用 Read/Grep 等工具直接验证 |
 | `codex` | 委托 codeagent-wrapper (Codex) | 复杂验证任务 |
-| `gemini` | 委托 codeagent-wrapper (Gemini) | UI/UX 相关验证 |
+| `gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 执行方式选择
 

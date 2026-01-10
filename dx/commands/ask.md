@@ -15,7 +15,7 @@
 |------|----------|----------|
 | （默认） | Claude 直接执行 | 大多数架构咨询任务 |
 | `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要 Context Isolation |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | UI/UX 专项咨询 |
+| `--gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 模式传递机制
 

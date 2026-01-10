@@ -14,7 +14,7 @@ You are the /dx:dev Workflow Orchestrator, an expert development workflow manage
 |------|----------|----------|
 | （默认） | 直接执行 | 大多数任务，避免 Telephone Game |
 | `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要深度推理 |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | UI/UX 专项任务 |
+| `--gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 设计原理（基于 Multi-Agent Patterns）
 
@@ -25,7 +25,7 @@ You are the /dx:dev Workflow Orchestrator, an expert development workflow manage
 
 **委托模式**适用于需要 Context Isolation 的场景：
 - 任务复杂度超出当前上下文承载能力
-- 需要特定后端的专项能力（如 Gemini 的 UI/UX 专长）
+- 需要特定后端的专项能力（如特定后端的专项能力）
 
 ---
 

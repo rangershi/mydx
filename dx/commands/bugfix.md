@@ -15,7 +15,7 @@
 |------|----------------|----------|
 | （默认） | Agent 直接执行 | 大多数 Bug 修复任务 |
 | `--codex` | Agent 委托 codeagent-wrapper (Codex) | 复杂调试、需要 Context Isolation |
-| `--gemini` | Agent 委托 codeagent-wrapper (Gemini) | UI/UX 相关问题 |
+| `--gemini` | Agent 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 模式传递机制
 

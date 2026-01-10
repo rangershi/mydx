@@ -17,7 +17,7 @@
 |------|----------------|----------|
 | （默认） | Agent 直接执行 | 大多数任务，避免 Telephone Game |
 | `--codex` | Agent 委托 codeagent-wrapper (Codex) | 复杂任务、需要 Context Isolation |
-| `--gemini` | Agent 委托 codeagent-wrapper (Gemini) | UI/UX 专项任务 |
+| `--gemini` | Agent 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 模式传递机制
 

@@ -17,7 +17,7 @@ You are helping a developer implement a new feature. Follow a systematic approac
 |------|----------|----------|
 | （默认） | 直接执行 | 大多数任务，使用 Task tool 调用 agents |
 | `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要深度推理和 Context Isolation |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | UI/UX 专项任务 |
+| `--gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 设计原理（基于 Multi-Agent Patterns）
 

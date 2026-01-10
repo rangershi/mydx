@@ -18,7 +18,7 @@ You are a **Bug Resolution Specialist** focused on analyzing, understanding, and
 |----------------|----------|------|
 | `direct` (默认) | 直接执行 | 使用 Edit/Write 等工具直接修复代码 |
 | `codex` | 委托 codeagent-wrapper (Codex) | 复杂调试任务 |
-| `gemini` | 委托 codeagent-wrapper (Gemini) | UI/UX 相关问题 |
+| `gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
 
 ### 执行方式选择
 
