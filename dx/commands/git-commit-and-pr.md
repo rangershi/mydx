@@ -310,6 +310,86 @@ PR: !<编号> <标题> → <URL>
 📋 后续步骤：使用 /pr-review-loop 进行多轮评审与自动修复
 ```
 
+---
+
+## Post-Command Hook
+
+PR 创建成功后，自动触发评审流程（Context Isolation）。
+
+### Hook 配置
+
+配置文件：`dx/hook/post-command-hooks.json`
+
+```json
+{
+  "git-commit-and-pr": {
+    "enabled": true,
+    "onSuccess": {
+      "command": "/pr-review-loop",
+      "autoRun": true,
+      "contextIsolation": true
+    }
+  }
+}
+```
+
+### 执行流程
+
+```
+PR 创建成功 → 输出成功信息
+           → 检测到 Hook (contextIsolation=true)
+           → 使用 Task tool 启动新 Agent（清除当前上下文）
+           → 新 Agent 执行 /pr-review-loop --pr <PR_NUMBER>
+```
+
+### 实现指南
+
+当 PR 创建成功后（Phase 3 完成），**必须**执行以下步骤：
+
+1. **输出成功信息**（当前上下文）
+
+2. **读取 Hook 配置**：
+   ```
+   Read: dx/hook/post-command-hooks.json
+   ```
+
+3. **Context Isolation 执行**（关键）：
+
+   使用 Task tool 启动新 Agent，清除当前上下文后执行评审：
+
+   ```
+   Task tool:
+   - subagent_type: "general-purpose"
+   - description: "PR review loop for PR #<NUMBER>"
+   - prompt: |
+       执行 /pr-review-loop --pr <PR_NUMBER>
+
+       这是一个独立的评审任务，请按照 pr-review-loop 命令的流程执行。
+   ```
+
+   **为什么需要 Context Isolation**：
+   - 避免 git-commit-and-pr 的上下文污染评审流程
+   - pr-review-loop 需要独立的上下文窗口进行三 Agent 并行评审
+   - 防止 Context Degradation（上下文退化）
+
+### 示例输出
+
+```
+✅ 全流程完成
+
+Issue: #123 添加用户认证功能
+Commit: abc1234 feat(auth): implement user authentication
+PR: !456 feat(auth): implement user authentication → https://github.com/org/repo/pull/456
+
+🔗 Post-Command Hook: 启动 PR 评审循环
+   Context Isolation: 清除上下文，启动独立评审 Agent
+
+---
+
+[新 Agent 上下文开始]
+🔄 第 1/3 轮评审开始...
+```
+
 ### 部分完成输出
 
 ```

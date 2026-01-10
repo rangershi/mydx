@@ -1,10 +1,8 @@
-.claude/
-.claude-trace
-.DS_Store
-**/.DS_Store
-.venv
-.pytest_cache
-__pycache__
-.coverage
-coverage.out
-/.idea/
+### Example user template template
+### Example user template
+
+# IntelliJ project files
+.idea
+*.iml
+out
+gen

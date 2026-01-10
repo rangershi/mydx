@@ -120,11 +120,6 @@ These rules have HIGHEST PRIORITY and override all other instructions:
   [2-5 tasks with: ID, description, file scope, dependencies, test command]
   ```
 
-  **Skip Deep Analysis When**:
-  - Simple, straightforward implementation with obvious approach
-  - Small changes confined to 1-2 files
-  - Clear requirements with single implementation path
-
 - **Step 3: Generate Development Documentation**
   - invoke agent dev-plan-generator
   - Output a brief summary of dev-plan.md:

@@ -6,9 +6,49 @@ description: '代码降熵扫描：识别并修复技术债务与规范违规'
 ## Usage
 
 ```bash
-# 执行完整扫描（顺序检查5个项目）
+# 执行完整扫描（默认：直接执行）
 /code-entropy-scan
+
+# 使用 Codex 后端执行
+/code-entropy-scan --codex
+
+# 使用 Gemini 后端执行
+/code-entropy-scan --gemini
 ```
+
+### Options
+- `--codex`: 使用 codeagent-wrapper (Codex backend) 执行扫描和修复
+- `--gemini`: 使用 codeagent-wrapper (Gemini backend) 执行扫描和修复
+
+---
+
+## 执行模式
+
+用户通过参数直接指定执行模式，无需判断：
+
+| 参数 | 执行方式 | 适用场景 |
+|------|----------|----------|
+| （默认） | 直接执行（当前模型） | 大多数任务，避免 Telephone Game |
+| `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要 Context Isolation |
+| `--gemini` | 委托 codeagent-wrapper (Gemini) | 需要 Gemini 模型能力 |
+
+### 模式传递机制
+
+1. 解析参数，确定 `EXECUTION_MODE`:
+   - 默认: `direct`
+   - `--codex`: `codex`
+   - `--gemini`: `gemini`
+
+2. 根据 `EXECUTION_MODE` 决定执行方式：
+   - `direct`: 使用 Edit/Read/Grep 等工具直接执行扫描和修复
+   - `codex`/`gemini`: 委托给 `codeagent-wrapper --backend {mode}` 执行
+
+3. 委托执行时的 prompt 格式：
+   ```
+   codeagent-wrapper --backend {mode} "执行代码降熵扫描第 N 阶段: {phase_description}"
+   ```
+
+---
 
 命令会依次执行：
 1. E2E 测试用例名称中文检查
@@ -483,9 +523,33 @@ rg "process\.env\.DATABASE_URL" apps/backend/prisma/scripts apps/backend/*.ts
 
 ## 工作流程
 
+### 阶段 0：解析执行模式
+
+命令启动后首先解析参数确定执行模式：
+
+```
+1. 解析命令参数
+2. 确定 EXECUTION_MODE:
+   - 无参数 → direct（直接执行）
+   - --codex → codex（Codex 后端）
+   - --gemini → gemini（Gemini 后端）
+3. 根据模式选择执行方式
+```
+
+**执行方式分支**：
+
+- **direct 模式**：使用 Edit/Read/Grep 等工具直接执行扫描和修复
+- **codex/gemini 模式**：委托给 codeagent-wrapper 执行
+  ```bash
+  codeagent-wrapper --backend {mode} "执行代码降熵扫描: {task_description}"
+  ```
+
 ### 阶段 1：执行扫描
 
-命令启动后自动顺序执行九项检查，无需参数。
+根据 `EXECUTION_MODE` 执行九项检查：
+
+**direct 模式**：直接使用下面的命令执行扫描
+**codex/gemini 模式**：将扫描任务委托给 codeagent-wrapper
 
 #### 1.1 E2E 中文测试名称扫描
 
@@ -839,6 +903,22 @@ apps/backend/src/modules/user/controllers/user.controller.ts:
 
 ### 阶段 4：执行修复
 
+根据 `EXECUTION_MODE` 执行修复：
+
+**direct 模式**：使用 Edit 工具直接修改代码文件
+**codex/gemini 模式**：将修复任务委托给 codeagent-wrapper
+
+```bash
+# codex/gemini 模式下的委托执行示例
+codeagent-wrapper --backend {mode} "
+执行代码降熵修复任务:
+- 修复范围: {selected_checks}
+- 扫描报告: {scan_report_summary}
+- 修复策略: 按照检查项说明执行修复
+- 验证要求: 修复后运行 lint 和受影响的测试
+"
+```
+
 #### 4.1 修复 E2E 中文测试名称
 
 对于每个中文测试名称：
@@ -1145,6 +1225,11 @@ const databaseUrl = defaultEnvAccessor.str('DATABASE_URL')
 
 ### 阶段 5：验证与测试
 
+根据 `EXECUTION_MODE` 执行验证：
+
+**direct 模式**：直接使用 Bash 工具执行验证命令
+**codex/gemini 模式**：验证任务作为修复任务的一部分由 codeagent-wrapper 执行
+
 修复完成后：
 
 1. 执行 `./scripts/dx lint` 检查代码风格
@@ -1346,7 +1431,7 @@ E2E 重复实现       | 21       | 2        | 0
 
 ## 示例场景
 
-### 完整扫描与修复流程
+### 示例 1：默认模式（直接执行）
 
 ```
 用户：/code-entropy-scan
@@ -1420,12 +1505,79 @@ E2E 重复实现       | 21       | 2        | 0
 建议使用 /git-commit-and-pr 提交代码
 ```
 
+### 示例 2：使用 Codex 后端
+
+```
+用户：/code-entropy-scan --codex
+
+助手：
+检测到 EXECUTION_MODE: codex
+将使用 codeagent-wrapper (Codex backend) 执行扫描和修复
+
+开始代码降熵扫描...
+
+执行命令：
+codeagent-wrapper --backend codex "执行代码降熵扫描，依次检查:
+1. E2E 测试用例名称中文检查
+2. E2E 测试重复实现检查
+3. 分页 DTO 规范检查
+...（共9项检查）
+输出结构化扫描报告"
+
+[等待 Codex 后端执行完成]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📊 扫描汇总（由 Codex 执行）：
+总计发现 76 处技术债务
+
+[展示详细报告...]
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+是否需要修复这些问题？
+[选项列表...]
+
+用户：1（全部修复）
+
+助手：
+执行命令：
+codeagent-wrapper --backend codex "执行代码降熵修复任务:
+- 修复范围: 全部 9 项检查
+- 修复策略: 按照检查项说明执行修复
+- 验证要求: 修复后运行 lint 和受影响的测试"
+
+[等待 Codex 后端执行完成]
+
+✅ 修复完成！
+
+[展示修复报告]
+
+建议使用 /git-commit-and-pr 提交代码
+```
+
+### 示例 3：使用 Gemini 后端
+
+```
+用户：/code-entropy-scan --gemini
+
+助手：
+检测到 EXECUTION_MODE: gemini
+将使用 codeagent-wrapper (Gemini backend) 执行扫描和修复
+
+开始代码降熵扫描...
+
+执行命令：
+codeagent-wrapper --backend gemini "执行代码降熵扫描，依次检查:
+1. E2E 测试用例名称中文检查
+2. E2E 测试重复实现检查
+...（共9项检查）"
+
+[等待 Gemini 后端执行完成]
+
+[后续流程与 Codex 模式类似]
+```
+
 ---
 
 自动化识别技术债务，保持代码库低熵运行，让重构成为日常而非负担。
-
-**版本更新**：
-- v1.1 (2025-11): 新增 Prisma 7.x 适配器检查、API 迁移检查、E2E 统一夹具检查、脚本环境加载检查
-  - 背景：Prisma 7.x 强制要求 Driver Adapter，`new PrismaClient()` 不再支持
-  - 背景：统一使用 `loadEnvironment()` 和 `defaultEnvAccessor` 访问环境变量
-  - 背景：E2E 测试应使用 `createProductionLikeTestingApp()` 确保测试环境一致性

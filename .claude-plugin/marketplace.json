@@ -1,53 +1,71 @@
 {
-  "name": "claude-code-dev-workflows",
+  "name": "dx",
   "owner": {
-    "name": "Claude Code Dev Workflows",
+    "name": "DX Team",
     "email": "contact@example.com",
     "url": "https://github.com/rangershi/mydx"
   },
   "metadata": {
-    "description": "Professional multi-agent development workflows with Requirements-Driven and BMAD methodologies, featuring 16+ specialized agents and 12+ commands",
+    "description": "Developer Experience toolkit with development workflows, code review, PR automation, and AI-assisted agents",
     "version": "1.0.0"
   },
   "plugins": [
     {
-      "name": "requirements-driven-development",
-      "source": "./requirements-driven-workflow/",
-      "description": "Streamlined requirements-driven development workflow with 90% quality gates for practical feature implementation",
+      "name": "dx",
+      "source": "./dx/",
+      "description": "Developer Experience toolkit for team workflows, code review, PR automation, and development commands",
       "author": {
-        "name": "Claude Code Dev Workflows",
+        "name": "DX Team",
         "url": "https://github.com/rangershi/mydx"
       },
       "homepage": "https://github.com/rangershi/mydx",
       "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
-        "requirements",
+        "dx",
+        "developer-experience",
         "workflow",
         "automation",
-        "quality-gates",
-        "feature-development",
-        "agile",
-        "specifications"
+        "code-review",
+        "pr-automation",
+        "development",
+        "agents"
       ],
       "category": "workflows",
       "strict": false,
       "commands": [
-        "./commands/requirements-pilot.md"
+        "./commands/ask.md",
+        "./commands/bugfix.md",
+        "./commands/code.md",
+        "./commands/code-entropy-scan.md",
+        "./commands/dev.md",
+        "./commands/doctor.md",
+        "./commands/git-commit-and-pr.md",
+        "./commands/pr-review-loop.md"
       ],
       "agents": [
-        "./agents/requirements-generate.md",
-        "./agents/requirements-code.md",
-        "./agents/requirements-testing.md",
-        "./agents/requirements-review.md"
+        "./agents/bugfix.md",
+        "./agents/bugfix-verify.md",
+        "./agents/codex-review.md",
+        "./agents/dev-plan-generator.md",
+        "./agents/issue-creator.md",
+        "./agents/pr-comments-analyzer.md",
+        "./agents/pr-fix.md",
+        "./agents/review.md"
+      ],
+      "skills": [
+        "./skills/codeagent/SKILL.md",
+        "./skills/codex/SKILL.md",
+        "./skills/gemini/SKILL.md",
+        "./skills/product-requirements/SKILL.md"
       ]
     },
     {
-      "name": "bmad-agile-workflow",
-      "source": "./bmad-agile-workflow/",
-      "description": "Full BMAD agile workflow with role-based agents (PO, Architect, SM, Dev, QA) and interactive approval gates",
+      "name": "bmad",
+      "source": "./dx/bmad/",
+      "description": "BMAD agile workflow with role-based agents (PO, Architect, SM, Dev, QA) and interactive approval gates",
       "author": {
-        "name": "Claude Code Dev Workflows",
+        "name": "DX Team",
         "url": "https://github.com/rangershi/mydx"
       },
       "homepage": "https://github.com/rangershi/mydx",
@@ -61,7 +79,7 @@
         "architect",
         "developer",
         "qa",
-        "workflow-orchestration"
+        "workflow"
       ],
       "category": "workflows",
       "strict": false,
@@ -79,114 +97,62 @@
       ]
     },
     {
-      "name": "development-essentials",
-      "source": "./development-essentials/",
-      "description": "Essential development commands for coding, debugging, testing, optimization, and documentation",
+      "name": "feature-dev",
+      "source": "./dx/feature-dev/",
+      "description": "Feature development workflow with code exploration, architecture planning, and code review agents",
       "author": {
-        "name": "Claude Code Dev Workflows",
+        "name": "DX Team",
         "url": "https://github.com/rangershi/mydx"
       },
       "homepage": "https://github.com/rangershi/mydx",
       "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
-        "code",
-        "debug",
-        "test",
-        "optimize",
-        "review",
-        "bugfix",
-        "refactor",
-        "documentation"
+        "feature",
+        "development",
+        "architecture",
+        "code-review",
+        "exploration"
       ],
-      "category": "essentials",
+      "category": "workflows",
       "strict": false,
       "commands": [
-        "./commands/code.md",
-        "./commands/debug.md",
-        "./commands/test.md",
-        "./commands/optimize.md",
-        "./commands/review.md",
-        "./commands/bugfix.md",
-        "./commands/refactor.md",
-        "./commands/docs.md",
-        "./commands/ask.md",
-        "./commands/think.md"
+        "./commands/feature-dev.md"
       ],
       "agents": [
-        "./agents/code.md",
-        "./agents/bugfix.md",
-        "./agents/bugfix-verify.md",
-        "./agents/optimize.md",
-        "./agents/debug.md"
+        "./agents/code-architect.md",
+        "./agents/code-explorer.md",
+        "./agents/code-reviewer.md"
       ]
     },
     {
-      "name": "dev-workflow",
-      "source": "./dev-workflow/",
-      "description": "Minimal lightweight development workflow with requirements clarification, parallel codex execution, and mandatory 90% test coverage",
+      "name": "requirements-driven-workflow",
+      "source": "./dx/requirements-driven-workflow/",
+      "description": "Requirements-driven development workflow with specification generation, coding, testing, and review agents",
       "author": {
-        "name": "Claude Code Dev Workflows",
+        "name": "DX Team",
         "url": "https://github.com/rangershi/mydx"
       },
       "homepage": "https://github.com/rangershi/mydx",
       "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
-        "dev",
+        "requirements",
         "workflow",
-        "codex",
+        "specifications",
         "testing",
-        "coverage",
-        "concurrent",
-        "lightweight"
+        "code-review"
       ],
       "category": "workflows",
       "strict": false,
       "commands": [
-        "./commands/dev.md"
+        "./commands/requirements-pilot.md"
       ],
       "agents": [
-        "./agents/dev-plan-generator.md"
-      ]
-    },
-    {
-      "name": "dx",
-      "source": "./dx/",
-      "description": "Developer Experience toolkit for team workflows and automation",
-      "author": {
-        "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "dx",
-        "developer-experience",
-        "workflow",
-        "automation",
-        "team-tools"
-      ],
-      "category": "workflows",
-      "strict": false,
-      "commands": [
-        "./commands/doctor.md",
-        "./commands/code-entropy-scan.md",
-        "./commands/git-commit-and-pr.md",
-        "./commands/pr-review-loop.md"
-      ],
-      "agents": [
-        "./agents/issue-creator.md",
-        "./agents/pr-comments-analyzer.md",
-        "./agents/pr-fix.md",
-        "./agents/codex-review.md",
-        "./agents/review.md"
-      ],
-      "skills": [
-        "../skills/codex/SKILL.md",
-        "../skills/gemini/SKILL.md",
-        "../skills/product-requirements/SKILL.md"
+        "./agents/requirements-generate.md",
+        "./agents/requirements-code.md",
+        "./agents/requirements-testing.md",
+        "./agents/requirements-review.md"
       ]
     }
   ]
