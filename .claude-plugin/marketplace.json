@@ -13,7 +13,7 @@
     {
       "name": "dx",
       "source": "./dx/",
-      "description": "Developer Experience toolkit for team workflows, code review, PR automation, and development commands",
+      "description": "Developer Experience toolkit - complete development workflows including BMAD agile, feature development, requirements-driven workflow, code review, and PR automation",
       "author": {
         "name": "DX Team",
         "url": "https://github.com/rangershi/mydx"
@@ -28,8 +28,10 @@
         "automation",
         "code-review",
         "pr-automation",
-        "development",
-        "agents"
+        "bmad",
+        "agile",
+        "requirements",
+        "feature-development"
       ],
       "category": "workflows",
       "strict": false,
@@ -41,7 +43,10 @@
         "./commands/dev.md",
         "./commands/doctor.md",
         "./commands/git-commit-and-pr.md",
-        "./commands/pr-review-loop.md"
+        "./commands/pr-review-loop.md",
+        "./bmad/commands/bmad-pilot.md",
+        "./feature-dev/commands/feature-dev.md",
+        "./requirements-driven-workflow/commands/requirements-pilot.md"
       ],
       "agents": [
         "./agents/bugfix.md",
@@ -51,7 +56,21 @@
         "./agents/issue-creator.md",
         "./agents/pr-comments-analyzer.md",
         "./agents/pr-fix.md",
-        "./agents/review.md"
+        "./agents/review.md",
+        "./bmad/agents/bmad-po.md",
+        "./bmad/agents/bmad-architect.md",
+        "./bmad/agents/bmad-sm.md",
+        "./bmad/agents/bmad-dev.md",
+        "./bmad/agents/bmad-qa.md",
+        "./bmad/agents/bmad-orchestrator.md",
+        "./bmad/agents/bmad-review.md",
+        "./feature-dev/agents/code-architect.md",
+        "./feature-dev/agents/code-explorer.md",
+        "./feature-dev/agents/code-reviewer.md",
+        "./requirements-driven-workflow/agents/requirements-generate.md",
+        "./requirements-driven-workflow/agents/requirements-code.md",
+        "./requirements-driven-workflow/agents/requirements-testing.md",
+        "./requirements-driven-workflow/agents/requirements-review.md"
       ],
       "skills": [
         "./skills/codeagent/SKILL.md",
@@ -60,101 +79,6 @@
         "./skills/product-requirements/SKILL.md"
       ],
       "hooks": "./hooks/hooks.json"
-    },
-    {
-      "name": "bmad",
-      "source": "./dx/bmad/",
-      "description": "BMAD agile workflow with role-based agents (PO, Architect, SM, Dev, QA) and interactive approval gates",
-      "author": {
-        "name": "DX Team",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "bmad",
-        "agile",
-        "scrum",
-        "product-owner",
-        "architect",
-        "developer",
-        "qa",
-        "workflow"
-      ],
-      "category": "workflows",
-      "strict": false,
-      "commands": [
-        "./commands/bmad-pilot.md"
-      ],
-      "agents": [
-        "./agents/bmad-po.md",
-        "./agents/bmad-architect.md",
-        "./agents/bmad-sm.md",
-        "./agents/bmad-dev.md",
-        "./agents/bmad-qa.md",
-        "./agents/bmad-orchestrator.md",
-        "./agents/bmad-review.md"
-      ]
-    },
-    {
-      "name": "feature-dev",
-      "source": "./dx/feature-dev/",
-      "description": "Feature development workflow with code exploration, architecture planning, and code review agents",
-      "author": {
-        "name": "DX Team",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "feature",
-        "development",
-        "architecture",
-        "code-review",
-        "exploration"
-      ],
-      "category": "workflows",
-      "strict": false,
-      "commands": [
-        "./commands/feature-dev.md"
-      ],
-      "agents": [
-        "./agents/code-architect.md",
-        "./agents/code-explorer.md",
-        "./agents/code-reviewer.md"
-      ]
-    },
-    {
-      "name": "requirements-driven-workflow",
-      "source": "./dx/requirements-driven-workflow/",
-      "description": "Requirements-driven development workflow with specification generation, coding, testing, and review agents",
-      "author": {
-        "name": "DX Team",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "requirements",
-        "workflow",
-        "specifications",
-        "testing",
-        "code-review"
-      ],
-      "category": "workflows",
-      "strict": false,
-      "commands": [
-        "./commands/requirements-pilot.md"
-      ],
-      "agents": [
-        "./agents/requirements-generate.md",
-        "./agents/requirements-code.md",
-        "./agents/requirements-testing.md",
-        "./agents/requirements-review.md"
-      ]
     }
   ]
 }
