@@ -3,7 +3,7 @@
   "owner": {
     "name": "Claude Code Dev Workflows",
     "email": "contact@example.com",
-    "url": "https://github.com/cexll/myclaude"
+    "url": "https://github.com/rangershi/mydx"
   },
   "metadata": {
     "description": "Professional multi-agent development workflows with Requirements-Driven and BMAD methodologies, featuring 16+ specialized agents and 12+ commands",
@@ -17,10 +17,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "requirements",
@@ -50,10 +50,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "bmad",
@@ -87,10 +87,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "code",
@@ -131,10 +131,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "codex",
@@ -157,10 +157,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "gemini",
@@ -182,10 +182,10 @@
       "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/cexll/myclaude"
+        "url": "https://github.com/rangershi/mydx"
       },
-      "homepage": "https://github.com/cexll/myclaude",
-      "repository": "https://github.com/cexll/myclaude",
+      "homepage": "https://github.com/rangershi/mydx",
+      "repository": "https://github.com/rangershi/mydx",
       "license": "MIT",
       "keywords": [
         "dev",
