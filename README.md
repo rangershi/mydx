@@ -33,9 +33,11 @@ claude --plugin-dir /path/to/mydx
 
 ## 执行模式
 
-默认情况下，所有命令使用 **Claude 当前模型** 进行分析和执行。
+默认情况下，大多数命令使用 **Claude 当前模型** 进行分析和执行。
 
-对于支持后端委托的命令（如 `/dx:dev`），可以通过参数选择不同的执行后端：
+### 开发命令 (`/dx:dev`)
+
+可以通过参数选择不同的执行后端：
 
 | 参数 | 说明 |
 |------|------|
@@ -54,6 +56,29 @@ claude --plugin-dir /path/to/mydx
 
 # 委托给 Gemini 执行
 /dx:dev --gemini 实现用户登录功能
+```
+
+### PR 评审循环 (`/dx:pr-review-loop`)
+
+**注意**：此命令**默认使用 Codex (codeagent-wrapper)** 进行代码修复。
+
+| 参数 | 说明 |
+|------|------|
+| (默认) | 使用 Codex (codeagent-wrapper) 执行代码修复 |
+| `--nocodex` | 使用 Claude 当前模型直接执行修复 |
+
+**示例**：
+
+```bash
+# 默认模式：使用 Codex 修复（推荐，适合复杂问题）
+/dx:pr-review-loop
+
+# nocodex 模式：使用 Claude 直接修复（适合简单问题，减少 token 消耗）
+/dx:pr-review-loop --nocodex
+
+# 指定 PR 编号
+/dx:pr-review-loop --pr 123
+/dx:pr-review-loop --pr 123 --nocodex
 ```
 
 ## 主要命令
