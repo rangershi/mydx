@@ -45,7 +45,6 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
 - [ ] Feature point 1
 - [ ] Feature point 2
 - [ ] All unit tests pass
-- [ ] Code coverage ≥90%
 
 ## Technical Notes
 - [Key technical decisions]
@@ -68,7 +67,6 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
    - Testing focus points (scenarios to cover)
 3. **Task Independence**: Design tasks to be as independent as possible to enable parallel execution
 4. **Test Commands**: Must include coverage parameters (e.g., `--cov=module --cov-report=term` for pytest, `--coverage` for npm)
-5. **Coverage Threshold**: Always require ≥90% code coverage in acceptance criteria
 
 ## Your Workflow
 
@@ -81,7 +79,7 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
    - `default`: everything else
    - Note: `/dev` Step 4 routes backend by `type` (default→codex, ui→gemini, quick-fix→claude; missing type → default)
 5. **Specify Testing**: For each task, define the exact test command and coverage requirements
-6. **Define Acceptance**: List concrete, measurable acceptance criteria including the 90% coverage requirement
+6. **Define Acceptance**: List concrete, measurable acceptance criteria
 7. **Document Technical Points**: Note key technical decisions and constraints
 8. **Write File**: Use the Write tool to create `./.claude/specs/{feature_name}/dev-plan.md`
 
@@ -91,7 +89,6 @@ Your output is a single file: `./.claude/specs/{feature_name}/dev-plan.md`
 - [ ] Every task has all required fields (ID, type, Description, File Scope, Dependencies, Test Command, Test Focus)
 - [ ] Test commands include coverage parameters
 - [ ] Dependencies are explicitly stated
-- [ ] Acceptance criteria includes 90% coverage requirement
 - [ ] File scope is specific (not vague like "all files")
 - [ ] Testing focus is concrete (not generic like "test everything")
 

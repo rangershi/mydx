@@ -19,7 +19,7 @@ dev-plan-generator (create dev doc)
   ↓
 codeagent concurrent development (2–5 tasks, backend routing)
   ↓
-codeagent testing & verification (≥90% coverage)
+codeagent testing & verification
   ↓
 Done (generate summary)
 ```

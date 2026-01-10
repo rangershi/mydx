@@ -48,7 +48,7 @@ python3 install.py --install-dir ~/.claude
 2. **Codex Deep Analysis** - Codebase exploration and architecture decisions
 3. **Dev Plan Generation** - Structured task breakdown with test requirements
 4. **Parallel Execution** - Codex executes tasks concurrently
-5. **Coverage Validation** - Enforce ≥90% test coverage
+5. **Test Validation** - Run and validate tests
 6. **Completion Summary** - Report with file changes and coverage stats
 
 **Key Features:**

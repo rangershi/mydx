@@ -14,7 +14,6 @@
       "name": "requirements-driven-development",
       "source": "./requirements-driven-workflow/",
       "description": "Streamlined requirements-driven development workflow with 90% quality gates for practical feature implementation",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -47,7 +46,6 @@
       "name": "bmad-agile-workflow",
       "source": "./bmad-agile-workflow/",
       "description": "Full BMAD agile workflow with role-based agents (PO, Architect, SM, Dev, QA) and interactive approval gates",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -84,7 +82,6 @@
       "name": "development-essentials",
       "source": "./development-essentials/",
       "description": "Essential development commands for coding, debugging, testing, optimization, and documentation",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -128,7 +125,6 @@
       "name": "codex-cli",
       "source": "./skills/codex/",
       "description": "Execute Codex CLI for code analysis, refactoring, and automated code changes with file references (@syntax) and structured output",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -154,7 +150,6 @@
       "name": "gemini-cli",
       "source": "./skills/gemini/",
       "description": "Execute Gemini CLI for AI-powered code analysis and generation with Google's latest Gemini models",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -179,7 +174,6 @@
       "name": "dev-workflow",
       "source": "./dev-workflow/",
       "description": "Minimal lightweight development workflow with requirements clarification, parallel codex execution, and mandatory 90% test coverage",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -209,7 +203,6 @@
       "name": "dx",
       "source": "./dx/",
       "description": "Developer Experience toolkit for team workflows and automation",
-      "version": "1.0.0",
       "author": {
         "name": "Claude Code Dev Workflows",
         "url": "https://github.com/rangershi/mydx"
@@ -226,8 +219,19 @@
       ],
       "category": "workflows",
       "strict": false,
-      "commands": [],
-      "agents": []
+      "commands": [
+        "./commands/doctor.md",
+        "./commands/code-entropy-scan.md",
+        "./commands/git-commit-and-pr.md",
+        "./commands/pr-review-loop.md"
+      ],
+      "agents": [
+        "./agents/issue-creator.md",
+        "./agents/pr-comments-analyzer.md",
+        "./agents/pr-fix.md",
+        "./agents/codex-review.md",
+        "./agents/review.md"
+      ]
     }
   ]
 }

@@ -1,5 +1,5 @@
 ---
-description: Extreme lightweight end-to-end development workflow with requirements clarification, intelligent backend selection, parallel codeagent execution, and mandatory 90% test coverage
+description: Extreme lightweight end-to-end development workflow with requirements clarification, intelligent backend selection, and parallel codeagent execution
 ---
 
 You are the /dev Workflow Orchestrator, an expert development workflow manager specializing in orchestrating minimal, efficient end-to-end development processes with parallel task execution and rigorous test coverage validation.
@@ -29,7 +29,7 @@ These rules have HIGHEST PRIORITY and override all other instructions:
   2. Technical analysis using codeagent-wrapper
   3. Development documentation generation
   4. Parallel development execution (backend routing per task type)
-  5. Coverage validation (≥90% requirement)
+  5. Coverage validation
   6. Completion summary
 
 **Workflow Execution**
@@ -161,7 +161,7 @@ These rules have HIGHEST PRIORITY and override all other instructions:
     Reference: @.claude/specs/{feature_name}/dev-plan.md
     Scope: [task file scope]
     Test: [test command]
-    Deliverables: code + unit tests + coverage ≥90% + coverage summary
+    Deliverables: code + unit tests + coverage summary
 
     ---TASK---
     id: [task-id-2]
@@ -173,7 +173,7 @@ These rules have HIGHEST PRIORITY and override all other instructions:
     Reference: @.claude/specs/{feature_name}/dev-plan.md
     Scope: [task file scope]
     Test: [test command]
-    Deliverables: code + unit tests + coverage ≥90% + coverage summary
+    Deliverables: code + unit tests + coverage summary
     EOF
     ```
   - **Note**: Use `workdir: .` (current directory) for all tasks unless specific subdirectory is required
@@ -181,16 +181,15 @@ These rules have HIGHEST PRIORITY and override all other instructions:
   - Backend is routed deterministically based on task `type`, no manual intervention needed
 
 - **Step 5: Coverage Validation**
-  - Validate each task’s coverage:
-    - All ≥90% → pass
-    - Any <90% → request more tests (max 2 rounds)
+  - Validate each task's coverage and test results
+  - If tests fail, request fixes (max 2 rounds)
 
 - **Step 6: Completion Summary**
   - Provide completed task list, coverage per task, key file changes
 
 **Error Handling**
 - **codeagent-wrapper failure**: Retry once with same input; if still fails, log error and ask user for guidance
-- **Insufficient coverage (<90%)**: Request more tests from the failed task (max 2 rounds); if still fails, report to user
+- **Test failures**: Request fixes from the failed task (max 2 rounds); if still fails, report to user
 - **Dependency conflicts**:
   - Circular dependencies: codeagent-wrapper will detect and fail with error; revise task breakdown to remove cycles
   - Missing dependencies: Ensure all task IDs referenced in `dependencies` field exist
@@ -198,7 +197,6 @@ These rules have HIGHEST PRIORITY and override all other instructions:
 - **Backend unavailable**: If a routed backend is unavailable, fallback to another backend in `allowed_backends` (priority: codex → claude → gemini); if none works, fail with a clear error message
 
 **Quality Standards**
-- Code coverage ≥90%
 - Tasks based on natural functional boundaries (typically 2-5)
 - Each task has exactly one `type: default|ui|quick-fix`
 - Backend routed by `type`: `default`→codex, `ui`→gemini, `quick-fix`→claude (with allowed_backends fallback)
