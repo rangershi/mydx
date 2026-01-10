@@ -122,55 +122,6 @@
       ]
     },
     {
-      "name": "codex-cli",
-      "source": "./skills/codex/",
-      "description": "Execute Codex CLI for code analysis, refactoring, and automated code changes with file references (@syntax) and structured output",
-      "author": {
-        "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "codex",
-        "code-analysis",
-        "refactoring",
-        "automation",
-        "gpt-5",
-        "ai-coding"
-      ],
-      "category": "essentials",
-      "strict": false,
-      "skills": [
-        "./SKILL.md"
-      ]
-    },
-    {
-      "name": "gemini-cli",
-      "source": "./skills/gemini/",
-      "description": "Execute Gemini CLI for AI-powered code analysis and generation with Google's latest Gemini models",
-      "author": {
-        "name": "Claude Code Dev Workflows",
-        "url": "https://github.com/rangershi/mydx"
-      },
-      "homepage": "https://github.com/rangershi/mydx",
-      "repository": "https://github.com/rangershi/mydx",
-      "license": "MIT",
-      "keywords": [
-        "gemini",
-        "google-ai",
-        "code-analysis",
-        "code-generation",
-        "ai-reasoning"
-      ],
-      "category": "essentials",
-      "strict": false,
-      "skills": [
-        "./SKILL.md"
-      ]
-    },
-    {
       "name": "dev-workflow",
       "source": "./dev-workflow/",
       "description": "Minimal lightweight development workflow with requirements clarification, parallel codex execution, and mandatory 90% test coverage",
@@ -231,6 +182,11 @@
         "./agents/pr-fix.md",
         "./agents/codex-review.md",
         "./agents/review.md"
+      ],
+      "skills": [
+        "../skills/codex/SKILL.md",
+        "../skills/gemini/SKILL.md",
+        "../skills/product-requirements/SKILL.md"
       ]
     }
   ]
