@@ -56,6 +56,84 @@ cd your-project
 git clone https://github.com/rangershi/mydx.git .claude-plugin/mydx
 ```
 
+## 推荐开发流程
+
+### 第一步：方案讨论
+
+开始任何开发任务前，建议先使用 `/dx:ask` 进行技术方案讨论：
+
+```bash
+# 单独使用 Claude 分析
+/dx:ask 如何实现用户认证模块
+
+# 重要决策时使用多后端并行分析
+/dx:ask --codex --gemini 微服务拆分方案设计
+```
+
+### 第二步：选择开发流程
+
+根据功能复杂度（主要考虑上下文长度需求）从高到低选择合适的开发流程：
+
+| 复杂度 | 命令 | 适用场景 | 上下文需求 |
+|--------|------|----------|------------|
+| **高** | `/dx:bmad-pilot` | 大型功能、需要完整敏捷流程（PO→架构→SM→开发→QA→Review） | 最长 |
+| **中高** | `/dx:requirements-pilot` | 中大型功能、需要严格需求确认和质量门控 | 较长 |
+| **中** | `/dx:feature-dev` | 单个功能开发、需要架构设计和代码审查 | 中等 |
+| **低** | `/dx:dev` | 简单功能、快速迭代、小改动 | 最短 |
+
+### 选择建议
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        功能复杂度评估                            │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  需要多角色协作？需要完整敏捷流程？                               │
+│       ↓ 是                                                      │
+│  ┌─────────────────┐                                            │
+│  │ /dx:bmad-pilot  │  ← 模拟完整团队：PO、架构师、SM、开发、QA    │
+│  └─────────────────┘                                            │
+│       ↓ 否                                                      │
+│                                                                 │
+│  需要严格需求确认？需要质量门控（90+分）？                        │
+│       ↓ 是                                                      │
+│  ┌─────────────────────────┐                                    │
+│  │ /dx:requirements-pilot  │  ← 需求驱动：扫描→确认→实现→测试     │
+│  └─────────────────────────┘                                    │
+│       ↓ 否                                                      │
+│                                                                 │
+│  需要架构设计？需要代码审查？                                     │
+│       ↓ 是                                                      │
+│  ┌──────────────────┐                                           │
+│  │ /dx:feature-dev  │  ← 功能开发：探索→架构→实现→审查            │
+│  └──────────────────┘                                           │
+│       ↓ 否                                                      │
+│                                                                 │
+│  ┌───────────┐                                                  │
+│  │ /dx:dev   │  ← 轻量开发：快速实现                             │
+│  └───────────┘                                                  │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 示例场景
+
+```bash
+# 场景 1：大型电商系统重构
+/dx:ask --codex 电商系统微服务拆分方案
+/dx:bmad-pilot 重构订单模块为独立微服务
+
+# 场景 2：新增支付功能
+/dx:ask 支付模块技术选型
+/dx:requirements-pilot 实现支付宝支付集成
+
+# 场景 3：添加用户头像上传
+/dx:feature-dev 实现用户头像上传功能
+
+# 场景 4：修复登录 bug
+/dx:dev 修复登录页面验证码不显示问题
+```
+
 ## 执行模式
 
 默认情况下，大多数命令使用 **Claude 当前模型** 进行分析和执行。
@@ -191,6 +269,35 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 
 **入口命令**: `/dx:bmad-pilot`
 
+**命令参数**:
+
+| 参数 | 说明 |
+|------|------|
+| `--skip-scan` | 跳过仓库扫描阶段（不推荐，会失去代码库上下文） |
+| `--skip-tests` | 跳过 QA 测试阶段 |
+| `--direct-dev` | 跳过 SM 计划阶段，架构完成后直接进入开发 |
+| `--codex` | Agent 使用 Codex 后端执行（适合复杂任务） |
+| `--gemini` | Agent 使用 Gemini 后端执行 |
+
+**示例**:
+
+```bash
+# 完整流程（推荐）
+/dx:bmad-pilot 开发电商订单系统
+
+# 快速开发模式（跳过 SM 规划）
+/dx:bmad-pilot --direct-dev 实现商品搜索功能
+
+# 跳过测试
+/dx:bmad-pilot --skip-tests 添加数据导出功能
+
+# 使用 Codex 处理复杂任务
+/dx:bmad-pilot --codex 重构整体架构
+
+# 组合参数（快速原型）
+/dx:bmad-pilot --direct-dev --skip-tests 快速验证 POC
+```
+
 ### Requirements-Driven 工作流 (`requirements-driven-workflow/`)
 
 **需求驱动开发流程**，强调从需求确认到代码实现的完整链路。
@@ -210,6 +317,31 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 
 **入口命令**: `/dx:requirements-pilot`
 
+**命令参数**:
+
+| 参数 | 说明 |
+|------|------|
+| `--skip-scan` | 跳过仓库扫描阶段（不推荐，会失去代码库上下文） |
+| `--skip-tests` | 跳过测试阶段（适合简单改动或文档更新） |
+| `--codex` | Agent 使用 Codex 后端执行（适合复杂任务） |
+| `--gemini` | Agent 使用 Gemini 后端执行 |
+
+**示例**:
+
+```bash
+# 完整流程（推荐）
+/dx:requirements-pilot 实现用户积分系统
+
+# 跳过测试（简单任务）
+/dx:requirements-pilot --skip-tests 添加配置项
+
+# 使用 Codex 处理复杂任务
+/dx:requirements-pilot --codex 重构支付模块
+
+# 组合参数
+/dx:requirements-pilot --skip-scan --skip-tests 更新错误提示文案
+```
+
 ### Feature-Dev 工作流 (`feature-dev/`)
 
 **功能开发工作流**，专注于单个功能的完整开发周期。
@@ -221,6 +353,59 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 | `code-reviewer` | 代码审查与质量评估 |
 
 **入口命令**: `/dx:feature-dev`
+
+**命令参数**:
+
+| 参数 | 说明 |
+|------|------|
+| `--codex` | 使用 Codex 后端执行探索、架构和实现（适合复杂功能） |
+| `--gemini` | 使用 Gemini 后端执行 |
+
+**示例**:
+
+```bash
+# 默认模式（Claude 直接执行）
+/dx:feature-dev 实现用户头像上传功能
+
+# 使用 Codex 处理复杂功能
+/dx:feature-dev --codex 实现实时消息推送系统
+
+# 使用 Gemini
+/dx:feature-dev --gemini 实现图片处理功能
+```
+
+### Dev 轻量开发流程
+
+**轻量级端到端开发流程**，适合简单功能和快速迭代。
+
+**流程**:
+1. **需求澄清**（交互式问答）
+2. **技术分析**（代码库探索）
+3. **开发文档**（生成 dev-plan.md）
+4. **开发执行**（实现代码）
+5. **覆盖验证**（测试验证）
+
+**入口命令**: `/dx:dev`
+
+**命令参数**:
+
+| 参数 | 说明 |
+|------|------|
+| `--codex` | 委托 Codex 后端执行分析和开发（适合复杂度超预期的任务） |
+| `--gemini` | 委托 Gemini 后端执行 |
+
+**示例**:
+
+```bash
+# 默认模式（Claude 直接执行，推荐）
+/dx:dev 添加用户登录功能
+
+# 使用 Codex（任务复杂度超预期时）
+/dx:dev --codex 实现复杂的权限校验逻辑
+
+# 使用 Gemini
+/dx:dev --gemini 实现图片压缩功能
+```
 
 ## Skills 说明
 
@@ -252,12 +437,26 @@ codeagent-wrapper --backend {codex|gemini|claude} "task description"
 
 ### product-requirements (`skills/product-requirements/`)
 
-产品需求文档处理技能，帮助解析和结构化产品需求。
+交互式需求澄清技能，通过质量评分和迭代对话生成专业 PRD 文档。
 
-**功能**:
-- PRD 解析与结构化
-- 需求拆分为用户故事
-- 验收标准生成
+**核心能力**:
+- 100 分制需求质量评分（90+ 门控）
+- 五维度评估：业务价值、功能需求、用户体验、技术约束、范围优先级
+- 交互式澄清对话
+- 专业 PRD 文档生成（保存到 `docs/{feature-name}-prd.md`）
+
+**在 Workflow 中的集成**:
+
+| Workflow | 调用时机 | 触发条件 |
+|----------|----------|----------|
+| `/dx:bmad-pilot` | Phase 1.5（PO 分析前） | 需求描述不清晰（质量分 < 90） |
+| `/dx:requirements-pilot` | Phase 1.5（需求确认时） | 推荐始终调用以确保质量 |
+| `/dx:feature-dev` | Phase 3.1（澄清问题时） | 功能需求需要结构化文档 |
+
+**Skill 设计原则**（基于 tool-design）:
+- **What**: 交互式需求澄清，生成专业 PRD 文档
+- **When**: 需求不清晰、需要结构化文档、需要质量门控时
+- **Returns**: `docs/{feature-name}-prd.md` 文件，供后续阶段使用
 
 ## 目录结构
 
@@ -266,21 +465,18 @@ mydx/
 ├── .claude-plugin/
 │   └── marketplace.json    # 插件配置
 ├── dx/
-│   ├── commands/           # 命令定义
-│   ├── agents/             # Agent 定义
+│   ├── commands/           # 所有命令定义（统一 /dx:* 前缀）
+│   ├── agents/             # 通用 Agent 定义
 │   ├── skills/             # Skills 定义
 │   │   ├── codeagent/      # 多后端代码代理 (codex/gemini/claude)
 │   │   └── product-requirements/  # 产品需求处理
 │   ├── hooks/              # Hooks 配置（标准 Claude Code 格式）
 │   ├── bmad/               # BMAD 敏捷工作流
-│   │   ├── commands/       # BMAD 入口命令
-│   │   └── agents/         # BMAD 角色代理
+│   │   └── agents/         # BMAD 角色代理 (po/architect/sm/dev/qa/review)
 │   ├── feature-dev/        # 功能开发工作流
-│   │   ├── commands/       # 入口命令
-│   │   └── agents/         # 开发代理
+│   │   └── agents/         # 开发代理 (explorer/architect/reviewer)
 │   └── requirements-driven-workflow/  # 需求驱动工作流
-│       ├── commands/       # 入口命令
-│       └── agents/         # 需求代理
+│       └── agents/         # 需求代理 (generate/code/review/testing)
 └── README.md
 ```
 

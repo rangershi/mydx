@@ -127,6 +127,35 @@ Start this phase after repository scanning completes:
 - **If input > 500 characters**: First summarize the core functionality and ask user to confirm the summary is accurate
 - **If input is unclear or too brief**: Request more specific details before proceeding
 
+### 1.5. 需求澄清（显性调用 @product-requirements skill）
+
+**触发条件**: 需求描述需要结构化澄清时（推荐始终调用以确保质量）
+
+**调用方式**:
+```
+调用 @product-requirements skill 进行交互式需求澄清：
+
+Context:
+- Feature Name: {feature_name}
+- Initial Request: [$ARGUMENTS]
+- Repository Context: @./.claude/specs/{feature_name}/00-repository-context.md
+
+Task: 通过质量评分（100分制）和迭代对话，确保需求达到 90+ 分质量标准。
+
+Expected Output:
+- 质量分达到 90+ 的 PRD 文档
+- 保存到 docs/{feature_name}-prd.md
+```
+
+**Skill 职责**（基于 tool-design 原则）:
+- **What**: 交互式需求澄清，100分制质量评分，专业 PRD 文档生成
+- **When**: 需求确认阶段开始时，作为质量门控的第一步
+- **Returns**: `docs/{feature_name}-prd.md` 文件，供后续 requirements-generate agent 使用
+
+**与后续 Agent 的衔接**:
+- Skill 输出的 PRD 作为 requirements-generate agent 的输入
+- PRD 的质量分确保后续技术规格生成有清晰的需求基础
+
 ### 2. Requirements Gathering with Repository Context
 Apply repository scan results to requirements analysis:
 ```

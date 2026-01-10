@@ -106,6 +106,35 @@ Start this phase after repository scanning completes:
 - **If input > 500 characters**: First summarize the core functionality and ask user to confirm
 - **If input is unclear**: Request more specific details before proceeding
 
+### 1.5. 需求澄清（显性调用 @product-requirements skill）
+
+**触发条件**: 用户需求描述不够清晰（质量分 < 90）时
+
+**调用方式**:
+```
+调用 @product-requirements skill 进行交互式需求澄清：
+
+Context:
+- Feature Name: {feature_name}
+- Initial Request: [$ARGUMENTS]
+- Repository Context: @./.claude/specs/{feature_name}/00-repo-scan.md
+
+Task: 通过质量评分和迭代对话，将用户需求转化为清晰的 PRD 文档。
+
+Expected Output:
+- 质量分达到 90+ 的 PRD 文档
+- 保存到 docs/{feature_name}-prd.md
+```
+
+**Skill 职责**（基于 tool-design 原则）:
+- **What**: 交互式需求澄清，生成专业 PRD 文档
+- **When**: 需求不清晰、需要结构化文档、需要质量门控时
+- **Returns**: `docs/{feature_name}-prd.md` 文件，包含完整的需求规格
+
+**与 PO Agent 的协作**:
+- Skill 负责：需求澄清对话、质量评分、PRD 文档生成
+- PO Agent 负责：基于 PRD 进行技术分析、用户故事拆分、验收标准细化
+
 ### 2. Orchestrate Interactive PO Process
 
 #### 2a. Initial PO Analysis

@@ -129,6 +129,38 @@ EOF
 
 **CRITICAL**: This is one of the most important phases. DO NOT SKIP.
 
+### 3.1 需求澄清（显性调用 @product-requirements skill）
+
+**触发条件**: 功能需求需要结构化澄清，或需要生成正式 PRD 文档时
+
+**调用方式**:
+```
+调用 @product-requirements skill 进行交互式需求澄清：
+
+Context:
+- Feature Name: {feature_name}
+- Initial Request: $ARGUMENTS
+- Codebase Findings: [Phase 2 探索结果摘要]
+
+Task: 通过质量评分（100分制）和迭代对话，将功能需求转化为清晰的 PRD 文档。
+
+Expected Output:
+- 质量分达到 90+ 的 PRD 文档
+- 保存到 docs/{feature_name}-prd.md
+```
+
+**Skill 职责**（基于 tool-design 原则）:
+- **What**: 交互式需求澄清，质量评分，专业 PRD 生成
+- **When**: 功能需求不够清晰、需要结构化文档、复杂功能需要质量门控时
+- **Returns**: `docs/{feature_name}-prd.md` 文件，供架构设计阶段使用
+
+**何时跳过 Skill**:
+- 需求已经非常清晰（用户明确表示不需要 PRD）
+- 简单功能改动（如 UI 微调、配置变更）
+- 用户已提供完整需求文档
+
+### 3.2 补充澄清（Skill 之后或代替 Skill）
+
 **Actions**:
 1. Review the codebase findings and original feature request
 2. Identify underspecified aspects: edge cases, error handling, integration points, scope boundaries, design preferences, backward compatibility, performance needs
