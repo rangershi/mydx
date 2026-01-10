@@ -169,9 +169,9 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 | `/dx:code-entropy-scan` | 代码熵扫描分析 |
 | `/dx:git-commit-and-pr` | 提交代码并创建 PR |
 | `/dx:pr-review-loop` | PR 评审循环 |
-| `/bmad:bmad-pilot` | BMAD 敏捷流程 |
-| `/feature-dev:feature-dev` | 功能开发流程 |
-| `/requirements-driven-workflow:requirements-pilot` | 需求驱动开发流程 |
+| `/dx:bmad-pilot` | BMAD 敏捷流程 |
+| `/dx:feature-dev` | 功能开发流程 |
+| `/dx:requirements-pilot` | 需求驱动开发流程 |
 
 ## 工作流详解
 
@@ -189,7 +189,7 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 | `bmad-review` | 代码审查 | Code Review |
 | `bmad-orchestrator` | 编排器 | 协调各角色工作流 |
 
-**入口命令**: `/bmad:bmad-pilot`
+**入口命令**: `/dx:bmad-pilot`
 
 ### Requirements-Driven 工作流 (`requirements-driven-workflow/`)
 
@@ -208,7 +208,7 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 3. **用户审批门控**（必须获得用户确认才进入实现）
 4. **Phase 2**: 实现（规格生成 → 代码实现 → 评审 → 测试）
 
-**入口命令**: `/requirements-driven-workflow:requirements-pilot`
+**入口命令**: `/dx:requirements-pilot`
 
 ### Feature-Dev 工作流 (`feature-dev/`)
 
@@ -220,7 +220,7 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 | `code-architect` | 功能架构设计 |
 | `code-reviewer` | 代码审查与质量评估 |
 
-**入口命令**: `/feature-dev:feature-dev`
+**入口命令**: `/dx:feature-dev`
 
 ## Skills 说明
 

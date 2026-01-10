@@ -1,5 +1,5 @@
 ## Usage
-`/bmad-pilot <PROJECT_DESCRIPTION> [OPTIONS]`
+`/dx:bmad-pilot <PROJECT_DESCRIPTION> [OPTIONS]`
 
 ### Options
 - `--skip-tests`: Skip QA testing phase

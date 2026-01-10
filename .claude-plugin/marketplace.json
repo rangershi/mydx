@@ -44,9 +44,9 @@
         "./commands/doctor.md",
         "./commands/git-commit-and-pr.md",
         "./commands/pr-review-loop.md",
-        "./bmad/commands/bmad-pilot.md",
-        "./feature-dev/commands/feature-dev.md",
-        "./requirements-driven-workflow/commands/requirements-pilot.md"
+        "./commands/bmad-pilot.md",
+        "./commands/feature-dev.md",
+        "./commands/requirements-pilot.md"
       ],
       "agents": [
         "./agents/analyser.md",

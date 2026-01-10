@@ -1,5 +1,5 @@
 ## Usage
-`/requirements-pilot <FEATURE_DESCRIPTION> [OPTIONS]`
+`/dx:requirements-pilot <FEATURE_DESCRIPTION> [OPTIONS]`
 
 ### Options
 - `--skip-tests`: Skip testing phase entirely

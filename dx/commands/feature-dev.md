@@ -3,6 +3,9 @@ description: Guided feature development with codebase understanding and architec
 argument-hint: Optional feature description [--codex|--gemini]
 ---
 
+## Usage
+`/dx:feature-dev [FEATURE_DESCRIPTION] [OPTIONS]`
+
 # Feature Development
 
 You are helping a developer implement a new feature. Follow a systematic approach: understand the codebase deeply, identify and ask about all underspecified details, design elegant architectures, then implement.
