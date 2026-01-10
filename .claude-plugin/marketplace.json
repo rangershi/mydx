@@ -49,6 +49,7 @@
         "./requirements-driven-workflow/commands/requirements-pilot.md"
       ],
       "agents": [
+        "./agents/analyser.md",
         "./agents/bugfix.md",
         "./agents/bugfix-verify.md",
         "./agents/codex-review.md",
