@@ -1,0 +1,24 @@
+{
+  "name": "dx",
+  "source": "./",
+  "description": "Developer Experience toolkit for team workflows and automation",
+  "version": "1.0.0",
+  "author": {
+    "name": "Claude Code Dev Workflows",
+    "url": "https://github.com/rangershi/mydx"
+  },
+  "homepage": "https://github.com/rangershi/mydx",
+  "repository": "https://github.com/rangershi/mydx",
+  "license": "MIT",
+  "keywords": [
+    "dx",
+    "developer-experience",
+    "workflow",
+    "automation",
+    "team-tools"
+  ],
+  "category": "workflows",
+  "strict": false,
+  "commands": [],
+  "agents": []
+}
