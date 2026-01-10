@@ -58,7 +58,8 @@
         "./skills/codex/SKILL.md",
         "./skills/gemini/SKILL.md",
         "./skills/product-requirements/SKILL.md"
-      ]
+      ],
+      "hooks": "./hooks/hooks.json"
     },
     {
       "name": "bmad",

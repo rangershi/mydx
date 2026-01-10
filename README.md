@@ -129,7 +129,7 @@ mydx/
 │   ├── commands/           # 命令定义
 │   ├── agents/             # Agent 定义
 │   ├── skills/             # Skills 定义
-│   ├── hook/               # Hooks 配置
+│   ├── hooks/              # Hooks 配置（标准 Claude Code 格式）
 │   ├── bmad/               # BMAD 工作流
 │   ├── feature-dev/        # 功能开发工作流
 │   └── requirements-driven-workflow/  # 需求驱动工作流

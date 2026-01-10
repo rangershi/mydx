@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "检查刚才执行的 Bash 命令：\n\n1. 如果命令是 `gh pr create` 且成功创建了 PR（输出包含 PR URL），则：\n   - 提取 PR 编号\n   - 使用 Task tool 启动独立 Agent 执行 `/dx:pr-review-loop --pr <PR_NUMBER>`\n   - 使用 Context Isolation 模式（run_in_background: false）\n\n2. 如果不是 gh pr create 命令或未成功，则忽略此 hook。\n\n注意：这是自动化 PR 评审流程的一部分，确保每个新创建的 PR 都能自动进入评审循环。"
+          }
+        ]
+      }
+    ]
+  }
+}
