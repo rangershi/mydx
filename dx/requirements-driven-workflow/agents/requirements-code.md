@@ -1,6 +1,7 @@
 ---
 name: requirements-code
 description: Direct implementation agent that converts technical specifications into working code with minimal architectural overhead
+model: opus
 tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob, TodoWrite
 ---
 

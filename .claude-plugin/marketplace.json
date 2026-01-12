@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Developer Experience toolkit with development workflows, code review, PR automation, and AI-assisted agents",
-    "version": "1.0.3"
+    "version": "1.0.4"
   },
   "plugins": [
     {
@@ -43,6 +43,7 @@
         "./commands/dev.md",
         "./commands/doctor.md",
         "./commands/git-commit-and-pr.md",
+        "./commands/omo.md",
         "./commands/pr-review-loop.md",
         "./commands/bmad-pilot.md",
         "./commands/feature-dev.md",
@@ -75,7 +76,8 @@
       ],
       "skills": [
         "./skills/codeagent/SKILL.md",
-        "./skills/product-requirements/SKILL.md"
+        "./skills/product-requirements/SKILL.md",
+        "./skills/omo/SKILL.md"
       ],
       "hooks": "./hooks/hooks.json"
     }

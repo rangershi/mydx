@@ -1,6 +1,7 @@
 ---
 allowed-tools: [Bash, AskUserQuestion]
 description: '环境诊断：检测并安装 codeagent-wrapper 及后端 CLI 依赖'
+model: sonnet
 ---
 
 ## Usage

@@ -1,6 +1,7 @@
 ---
 name: requirements-testing
 description: Practical testing agent focused on functional validation and integration testing rather than exhaustive test coverage
+model: opus
 tools: Read, Edit, Write, Bash, Grep, Glob
 ---
 
