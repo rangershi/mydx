@@ -1,6 +1,7 @@
 ---
 name: requirements-generate
 description: Transform user requirements into code-friendly technical specifications optimized for automatic code generation
+model: opus
 tools: Read, Write, Glob, Grep, WebFetch, TodoWrite
 ---
 

@@ -1,6 +1,7 @@
 ---
 allowed-tools: [Bash, Read, Glob, TodoWrite, Edit, Grep, SearchReplace, WebSearch]
 description: '代码降熵扫描：识别并修复技术债务与规范违规'
+model: sonnet
 ---
 
 ## Usage

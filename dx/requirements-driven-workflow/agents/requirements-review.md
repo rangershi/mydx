@@ -1,6 +1,7 @@
 ---
 name: requirements-review
 description: Pragmatic code review agent focused on functionality, integration quality, and maintainability rather than architectural perfection
+model: opus
 tools: Read, Grep, Write, WebFetch
 ---
 
