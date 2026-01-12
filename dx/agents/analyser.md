@@ -2,6 +2,7 @@
 name: analyser
 description: Technical question analyzer providing expert architectural consultation and strategic guidance
 tools: Read, Grep, Glob, WebFetch, WebSearch
+color: yellow
 model: opus
 ---
 

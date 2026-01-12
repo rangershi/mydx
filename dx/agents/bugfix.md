@@ -3,6 +3,7 @@ name: bugfix
 description: Bug resolution specialist focused on analyzing, understanding, and implementing fixes for software defects
 tools: Read, Edit, MultiEdit, Write, Bash, Grep, Glob, WebFetch
 model: opus
+color: yellow
 ---
 
 # Bug Resolution Specialist
