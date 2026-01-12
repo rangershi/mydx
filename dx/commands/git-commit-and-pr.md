@@ -312,57 +312,52 @@ PR: !<编号> <标题> → <URL>
 
 ---
 
-## Post-Command Hook（标准 Claude Code Hooks 系统）
+## 自动触发 PR 评审循环
 
-PR 创建成功后，通过 Claude Code 标准 hooks 系统自动触发评审流程。
-
-### Hook 机制
-
-使用 Claude Code 的 `PostToolUse` hook，配置在 `dx/hooks/hooks.json`：
-
-```json
-{
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "prompt",
-            "prompt": "检查 gh pr create 命令执行结果，成功则自动启动 pr-review-loop"
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+PR 创建成功后，**本命令内部**自动触发评审流程（无需外部 hook）。
 
 ### 执行流程
 
 ```
-Phase 3 完成 → Bash 执行 gh pr create
-            → PostToolUse hook 触发
-            → 检测到 PR 创建成功
+Phase 3 完成 → gh pr create 成功
+            → 提取 PR 编号
             → 使用 Task tool 启动新 Agent（Context Isolation）
-            → 新 Agent 执行 /pr-review-loop --pr <PR_NUMBER>
+            → 新 Agent 执行 /dx:pr-review-loop --pr <PR_NUMBER>
 ```
 
-### Context Isolation 执行
+### Phase 3.5: 自动启动评审循环（必须执行）
 
-当 hook 检测到 PR 创建成功后，使用 Task tool 启动独立 Agent：
+**在 Phase 3 的 `gh pr create` 成功后，立即执行以下步骤：**
 
-```
-Task tool:
-- subagent_type: "general-purpose"
-- description: "PR review loop for PR #<NUMBER>"
-- prompt: |
-    执行 /dx:pr-review-loop --pr <PR_NUMBER>
+1. **从 gh pr create 输出中提取 PR 编号**
+   ```bash
+   # gh pr create 输出格式：https://github.com/owner/repo/pull/123
+   # 提取 PR 编号
+   PR_NUMBER=$(echo "$PR_URL" | grep -oE '[0-9]+$')
+   ```
 
-    这是一个独立的评审任务，请按照 pr-review-loop 命令的流程执行。
-```
+2. **使用 Task tool 启动独立评审 Agent**
+   ```
+   Task tool:
+   - subagent_type: "general-purpose"
+   - description: "PR review loop for PR #${PR_NUMBER}"
+   - prompt: |
+       执行 /dx:pr-review-loop --pr ${PR_NUMBER}
 
-**为什么需要 Context Isolation**：
+       这是一个独立的评审任务，请按照 pr-review-loop 命令的流程执行。
+   ```
+
+3. **输出启动信息**
+   ```
+   🔗 自动启动 PR 评审循环...
+      PR: #${PR_NUMBER}
+      Context Isolation: 启动独立评审 Agent
+   ```
+
+**⚠️ 重要：此步骤是强制执行的，不可跳过。**
+
+### 为什么需要 Context Isolation
+
 - 避免 git-commit-and-pr 的上下文污染评审流程
 - pr-review-loop 需要独立的上下文窗口进行三 Agent 并行评审
 - 防止 Context Degradation（上下文退化）
@@ -376,7 +371,7 @@ Issue: #123 添加用户认证功能
 Commit: abc1234 feat(auth): implement user authentication
 PR: !456 feat(auth): implement user authentication → https://github.com/org/repo/pull/456
 
-🔗 PostToolUse Hook 触发: 启动 PR 评审循环
+🔗 自动启动 PR 评审循环...
    Context Isolation: 启动独立评审 Agent
 
 ---

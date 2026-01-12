@@ -46,7 +46,74 @@ which gemini || command -v gemini
 gemini --version 2>/dev/null
 ```
 
-### 4. Claude LSP 服务 (推荐)
+### 4. Claude/Codex CLI 多版本检测 (重要)
+
+检测 `claude` 和 `codex` CLI 是否通过多个包管理器重复安装，避免升级冲突。
+
+**检测命令**：
+
+```bash
+# 检测 claude CLI 的所有安装位置
+CLAUDE_PATHS=""
+
+# npm global
+NPM_CLAUDE=$(npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code)
+if [ -n "$NPM_CLAUDE" ]; then
+    CLAUDE_PATHS="$CLAUDE_PATHS npm:$(npm root -g)/@anthropic-ai/claude-code"
+fi
+
+# pnpm global
+PNPM_CLAUDE=$(pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code)
+if [ -n "$PNPM_CLAUDE" ]; then
+    CLAUDE_PATHS="$CLAUDE_PATHS pnpm:$(pnpm root -g)/@anthropic-ai/claude-code"
+fi
+
+# yarn global
+YARN_CLAUDE=$(yarn global list 2>/dev/null | grep claude-code)
+if [ -n "$YARN_CLAUDE" ]; then
+    CLAUDE_PATHS="$CLAUDE_PATHS yarn:$(yarn global dir)/node_modules/@anthropic-ai/claude-code"
+fi
+
+# brew
+BREW_CLAUDE=$(brew list claude 2>/dev/null)
+if [ -n "$BREW_CLAUDE" ]; then
+    CLAUDE_PATHS="$CLAUDE_PATHS brew:$(brew --prefix)/bin/claude"
+fi
+
+# 检测 codex CLI 的所有安装位置
+CODEX_PATHS=""
+
+# npm global
+NPM_CODEX=$(npm list -g @openai/codex 2>/dev/null | grep codex)
+if [ -n "$NPM_CODEX" ]; then
+    CODEX_PATHS="$CODEX_PATHS npm:$(npm root -g)/@openai/codex"
+fi
+
+# pnpm global
+PNPM_CODEX=$(pnpm list -g @openai/codex 2>/dev/null | grep codex)
+if [ -n "$PNPM_CODEX" ]; then
+    CODEX_PATHS="$CODEX_PATHS pnpm:$(pnpm root -g)/@openai/codex"
+fi
+
+# yarn global
+YARN_CODEX=$(yarn global list 2>/dev/null | grep codex)
+if [ -n "$YARN_CODEX" ]; then
+    CODEX_PATHS="$CODEX_PATHS yarn:$(yarn global dir)/node_modules/@openai/codex"
+fi
+
+# brew
+BREW_CODEX=$(brew list codex 2>/dev/null)
+if [ -n "$BREW_CODEX" ]; then
+    CODEX_PATHS="$CODEX_PATHS brew:$(brew --prefix)/bin/codex"
+fi
+```
+
+**多版本问题**：
+- 不同包管理器安装的版本可能不一致
+- 升级时可能只更新了其中一个，导致版本混乱
+- PATH 优先级可能导致使用非预期版本
+
+### 5. Claude LSP 服务 (推荐)
 
 Claude Code 的 LSP 支持需要两部分配置：
 1. **启用 LSP 环境变量** - 在 settings.json 中设置 `ENABLE_LSP_TOOLS`
@@ -222,6 +289,85 @@ Claude LSP 服务    | 完整     | -         | 代码智能分析
 已安装的 LSP 服务器: typescript-language-server pyright
 ```
 
+### 阶段 2.5：CLI 多版本检测
+
+检测 `claude` 和 `codex` CLI 是否存在多个安装：
+
+```bash
+# 统计 claude CLI 安装数量
+CLAUDE_INSTALL_COUNT=0
+CLAUDE_INSTALLS=""
+
+# 检测各包管理器
+if npm list -g @anthropic-ai/claude-code 2>/dev/null | grep -q claude-code; then
+    CLAUDE_INSTALL_COUNT=$((CLAUDE_INSTALL_COUNT + 1))
+    CLAUDE_VERSION_NPM=$(npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code | sed 's/.*@//')
+    CLAUDE_INSTALLS="$CLAUDE_INSTALLS\n  - npm: v$CLAUDE_VERSION_NPM"
+fi
+
+if pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep -q claude-code; then
+    CLAUDE_INSTALL_COUNT=$((CLAUDE_INSTALL_COUNT + 1))
+    CLAUDE_VERSION_PNPM=$(pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code | awk '{print $2}')
+    CLAUDE_INSTALLS="$CLAUDE_INSTALLS\n  - pnpm: v$CLAUDE_VERSION_PNPM"
+fi
+
+if yarn global list 2>/dev/null | grep -q claude-code; then
+    CLAUDE_INSTALL_COUNT=$((CLAUDE_INSTALL_COUNT + 1))
+    CLAUDE_VERSION_YARN=$(yarn global list 2>/dev/null | grep claude-code | sed 's/.*@//')
+    CLAUDE_INSTALLS="$CLAUDE_INSTALLS\n  - yarn: v$CLAUDE_VERSION_YARN"
+fi
+
+if brew list claude 2>/dev/null >/dev/null; then
+    CLAUDE_INSTALL_COUNT=$((CLAUDE_INSTALL_COUNT + 1))
+    CLAUDE_VERSION_BREW=$(brew info claude 2>/dev/null | head -1 | awk '{print $3}')
+    CLAUDE_INSTALLS="$CLAUDE_INSTALLS\n  - brew: v$CLAUDE_VERSION_BREW"
+fi
+
+# 统计 codex CLI 安装数量
+CODEX_INSTALL_COUNT=0
+CODEX_INSTALLS=""
+
+if npm list -g @openai/codex 2>/dev/null | grep -q codex; then
+    CODEX_INSTALL_COUNT=$((CODEX_INSTALL_COUNT + 1))
+    CODEX_VERSION_NPM=$(npm list -g @openai/codex 2>/dev/null | grep codex | sed 's/.*@//')
+    CODEX_INSTALLS="$CODEX_INSTALLS\n  - npm: v$CODEX_VERSION_NPM"
+fi
+
+if pnpm list -g @openai/codex 2>/dev/null | grep -q codex; then
+    CODEX_INSTALL_COUNT=$((CODEX_INSTALL_COUNT + 1))
+    CODEX_VERSION_PNPM=$(pnpm list -g @openai/codex 2>/dev/null | grep codex | awk '{print $2}')
+    CODEX_INSTALLS="$CODEX_INSTALLS\n  - pnpm: v$CODEX_VERSION_PNPM"
+fi
+
+if yarn global list 2>/dev/null | grep -q codex; then
+    CODEX_INSTALL_COUNT=$((CODEX_INSTALL_COUNT + 1))
+    CODEX_VERSION_YARN=$(yarn global list 2>/dev/null | grep codex | sed 's/.*@//')
+    CODEX_INSTALLS="$CODEX_INSTALLS\n  - yarn: v$CODEX_VERSION_YARN"
+fi
+
+if brew list codex 2>/dev/null >/dev/null; then
+    CODEX_INSTALL_COUNT=$((CODEX_INSTALL_COUNT + 1))
+    CODEX_VERSION_BREW=$(brew info codex 2>/dev/null | head -1 | awk '{print $3}')
+    CODEX_INSTALLS="$CODEX_INSTALLS\n  - brew: v$CODEX_VERSION_BREW"
+fi
+```
+
+**如果检测到多版本安装**，输出警告：
+
+```
+⚠️  警告: 检测到 claude CLI 存在多个安装 (共 3 个)
+  - npm: v1.0.16
+  - pnpm: v1.0.14
+  - brew: v1.0.15
+
+   当前使用: $(which claude) -> npm 版本
+
+   多版本可能导致:
+   - 升级时版本不一致
+   - PATH 优先级导致使用非预期版本
+   - 命令行为不可预测
+```
+
 ### 阶段 3：警告信息
 
 **如果 codex CLI 未安装**：
@@ -353,6 +499,117 @@ xcode-select --install 2>/dev/null || brew install llvm
 详细指南: doc/claude-lsp-setup.md
 ```
 
+### 阶段 4.5：处理 CLI 多版本安装
+
+如果检测到 `claude` 或 `codex` CLI 存在多个安装（安装数量 > 1）：
+
+#### 4.5.1 显示多版本详情
+
+```
+检测到 CLI 多版本安装
+
+claude CLI (共 3 个安装):
+  - npm: v1.0.16 ← 当前使用
+  - pnpm: v1.0.14
+  - brew: v1.0.15
+
+codex CLI (共 2 个安装):
+  - npm: v0.1.5
+  - yarn: v0.1.4 ← 当前使用
+```
+
+#### 4.5.2 询问用户处理方式
+
+使用 `AskUserQuestion` 询问用户：
+
+**问题**：检测到 [CLI名称] 存在多个安装，这可能导致升级时版本混乱。是否要清理？
+
+**选项**：
+   - 选项 1: 保留 npm 版本，卸载其他（推荐）
+   - 选项 2: 保留 pnpm 版本，卸载其他
+   - 选项 3: 保留 yarn 版本，卸载其他
+   - 选项 4: 保留 brew 版本，卸载其他
+   - 选项 5: 跳过，保持现状
+
+> 注：只显示用户实际安装的选项
+
+#### 4.5.3 执行清理
+
+**如果用户选择清理**：
+
+```bash
+# 卸载 npm 版本
+npm uninstall -g @anthropic-ai/claude-code
+
+# 卸载 pnpm 版本
+pnpm remove -g @anthropic-ai/claude-code
+
+# 卸载 yarn 版本
+yarn global remove @anthropic-ai/claude-code
+
+# 卸载 brew 版本
+brew uninstall claude
+
+# 同理处理 codex
+npm uninstall -g @openai/codex
+pnpm remove -g @openai/codex
+yarn global remove @openai/codex
+brew uninstall codex
+```
+
+#### 4.5.4 升级到最新版本
+
+清理完成后，使用保留的包管理器升级到最新版本：
+
+```bash
+# npm
+npm install -g @anthropic-ai/claude-code@latest
+npm install -g @openai/codex@latest
+
+# pnpm
+pnpm add -g @anthropic-ai/claude-code@latest
+pnpm add -g @openai/codex@latest
+
+# yarn
+yarn global add @anthropic-ai/claude-code@latest
+yarn global add @openai/codex@latest
+
+# brew
+brew upgrade claude
+brew upgrade codex
+```
+
+#### 4.5.5 输出清理结果
+
+```
+✅ CLI 多版本清理完成
+
+claude CLI:
+  - 已卸载: pnpm, brew
+  - 保留: npm v1.0.16 → 已升级到 v1.0.17
+
+codex CLI:
+  - 已卸载: yarn
+  - 保留: npm v0.1.5 → 已升级到 v0.1.6
+
+现在可以正常升级，不会出现版本冲突。
+```
+
+#### 4.5.6 如果用户选择跳过
+
+输出：
+
+```
+已跳过 CLI 多版本清理。
+
+注意：多版本安装可能导致：
+- 升级时只更新其中一个版本
+- 不同终端使用不同版本
+- 命令行为不可预测
+
+如需后续清理，可再次运行 /dx:doctor
+```
+
 ### 阶段 5：处理 codeagent-wrapper 未安装情况
 
 如果 `codeagent-wrapper` 未安装：
@@ -451,6 +708,31 @@ LSP 服务器状态:
 核心功能已就绪。如需完整功能，请安装缺失的依赖。
 ```
 
+### 检测到多版本安装
+
+```
+环境诊断完成
+
+工具               | 状态     | 版本
+-------------------|----------|--------
+codeagent-wrapper  | 已安装   | v1.2.3
+claude             | 多版本   | -
+codex              | 多版本   | -
+gemini             | 已安装   | v2.0.0
+Claude LSP 服务    | 完整     | -
+
+⚠️  警告: 检测到 claude CLI 存在多个安装 (共 3 个)
+  - npm: v1.0.16 ← 当前使用
+  - pnpm: v1.0.14
+  - brew: v1.0.15
+
+⚠️  警告: 检测到 codex CLI 存在多个安装 (共 2 个)
+  - npm: v0.1.5 ← 当前使用
+  - yarn: v0.1.4
+
+多版本可能导致升级时版本混乱，是否要清理？
+```
+
 ### 核心依赖缺失
 
 ```
@@ -485,6 +767,7 @@ codeagent-wrapper 已成功安装 (v1.2.3)
 - 如果使用代理，确保代理配置正确
 - codex 和 gemini CLI 为可选依赖，不影响核心功能
 - 未安装可选 CLI 时，对应的 `--codex` 或 `--gemini` 参数将不可用
+- **多版本检测**：如果通过多个包管理器（npm、pnpm、yarn、brew）安装了同一 CLI，建议清理到只保留一个，避免升级时版本冲突
 
 ## Claude LSP 服务说明
 
