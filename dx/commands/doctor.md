@@ -47,7 +47,37 @@ which gemini || command -v gemini
 gemini --version 2>/dev/null
 ```
 
-### 4. Claude/Codex CLI 多版本检测 (重要)
+### 4. ccstatusline 插件 (推荐)
+
+Claude Code 状态行插件，提供实时状态显示和增强的命令行体验。
+
+**说明**：
+- ccstatusline 无需全局安装，通过 `npx` 或 `bunx` 直接运行
+- 需要在 `~/.claude/settings.json` 中配置 `statusLine` 字段
+- 配置后立即生效，无需重启
+
+**检测命令**：
+
+```bash
+# 检测 Claude Code settings.json 中是否配置了 statusLine
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+
+if [ -f "$CLAUDE_SETTINGS" ]; then
+    if grep -q '"statusLine"' "$CLAUDE_SETTINGS" 2>/dev/null; then
+        # 提取配置值
+        STATUS_LINE_CONFIG=$(grep -o '"statusLine"[^,}]*' "$CLAUDE_SETTINGS" | sed 's/"statusLine":[[:space:]]*"\([^"]*\)".*/\1/')
+        echo "已配置: $STATUS_LINE_CONFIG"
+    else
+        echo "未配置"
+    fi
+else
+    echo "settings.json 不存在"
+fi
+```
+
+**配置路径**: `~/.claude/settings.json`（全局配置，非项目级别）
+
+### 5. Claude/Codex CLI 多版本检测 (重要)
 
 检测 `claude` 和 `codex` CLI 是否通过多个包管理器重复安装，避免升级冲突。
 
@@ -114,7 +144,7 @@ fi
 - 升级时可能只更新了其中一个，导致版本混乱
 - PATH 优先级可能导致使用非预期版本
 
-### 5. Claude LSP 服务 (推荐)
+### 6. Claude LSP 服务 (推荐)
 
 Claude Code 的 LSP 支持需要两部分配置：
 1. **启用 LSP 环境变量** - 在 settings.json 中设置 `ENABLE_LSP_TOOLS`
@@ -272,6 +302,19 @@ else
     LSP_STATUS="未配置"
 fi
 
+# 5. 检查 ccstatusline 插件配置
+CCSTATUSLINE_STATUS="未配置"
+CCSTATUSLINE_CONFIG=""
+
+# 检测 Claude Code settings.json 中是否配置了 statusLine
+CLAUDE_SETTINGS="$HOME/.claude/settings.json"
+if [ -f "$CLAUDE_SETTINGS" ]; then
+    if grep -q '"statusLine"' "$CLAUDE_SETTINGS" 2>/dev/null; then
+        CCSTATUSLINE_STATUS="已配置"
+        CCSTATUSLINE_CONFIG=$(grep -o '"statusLine"[^,}]*' "$CLAUDE_SETTINGS" | sed 's/"statusLine":[[:space:]]*"\([^"]*\)".*/\1/')
+    fi
+fi
+
 ### 阶段 2：输出诊断报告
 
 根据检测结果输出报告：
@@ -284,6 +327,7 @@ fi
 codeagent-wrapper  | 已安装   | v1.2.3    | 核心依赖
 codex              | 已安装   | v1.0.0    | 支持 --codex 参数
 gemini             | 未安装   | -         | 支持 --gemini 参数
+ccstatusline       | 已配置   | npx       | 状态行增强
 Claude LSP 服务    | 完整     | -         | 代码智能分析
 
 检测到项目语言: TypeScript/JS Python
@@ -371,6 +415,16 @@ fi
 
 ### 阶段 3：警告信息
 
+**如果 ccstatusline 插件未配置**：
+
+```
+⚠️  警告: ccstatusline 状态行未配置
+   - 缺少状态行增强功能
+   - 插件无需安装，通过 npx/bunx 直接运行
+   - 需在 ~/.claude/settings.json 中添加 statusLine 配置
+   - 是否要自动配置？
+```
+
 **如果 codex CLI 未安装**：
 
 ```
@@ -410,9 +464,97 @@ fi
    - 如果刚刚修改过配置，请重启 Claude Code 使其生效
 ```
 
-### 阶段 4：处理 Claude LSP 服务配置
+### 阶段 4：处理 ccstatusline 插件配置
 
-#### 4.1 如果 LSP 环境变量未配置
+#### 4.1 如果未配置 statusLine
+
+使用 `AskUserQuestion` 询问用户：
+
+**问题**：ccstatusline 状态行未配置，是否要启用？
+
+**选项**：
+   - 选项 1: 使用 npx（推荐，兼容性好）
+   - 选项 2: 使用 bunx（更快，需安装 bun）
+   - 选项 3: 手动配置
+   - 选项 4: 跳过
+
+**如果用户选择自动配置（选项1或2）**：
+
+1. 使用 Read 工具读取 `~/.claude/settings.json`
+2. 使用 Edit 工具添加/更新 `statusLine` 配置：
+
+   - 选项 1 (npx)：
+   ```json
+   {
+     "statusLine": "npx ccstatusline@latest"
+   }
+   ```
+
+   - 选项 2 (bunx)：
+   ```json
+   {
+     "statusLine": "bunx ccstatusline@latest"
+   }
+   ```
+
+3. 如果 settings.json 不存在，使用 Write 工具创建
+
+**如果用户选择手动配置**：
+
+输出：
+```
+请手动编辑 ~/.claude/settings.json，添加以下配置：
+
+{
+  "statusLine": "npx ccstatusline@latest"
+}
+
+或使用 bunx（更快）：
+
+{
+  "statusLine": "bunx ccstatusline@latest"
+}
+
+配置后立即生效，无需重启。
+```
+
+**配置成功后输出**：
+
+```
+✅ ccstatusline 状态行已配置
+
+配置文件: ~/.claude/settings.json
+配置内容: "statusLine": "npx ccstatusline@latest"
+
+配置已立即生效，无需重启 Claude Code。
+
+首次运行时，ccstatusline 会显示交互式配置界面，您可以：
+- 自定义状态行显示内容
+- 配置颜色和样式
+- 添加自定义命令和文本
+
+详细信息: https://github.com/sirmalloc/ccstatusline
+```
+
+#### 4.2 如果用户选择跳过
+
+输出：
+```
+已跳过 ccstatusline 配置。
+
+如需后续配置，请在 ~/.claude/settings.json 中添加：
+
+{
+  "statusLine": "npx ccstatusline@latest"
+}
+
+或访问项目主页了解更多：
+https://github.com/sirmalloc/ccstatusline
+```
+
+### 阶段 5：处理 Claude LSP 服务配置
+
+#### 5.1 如果 LSP 环境变量未配置
 
 使用 `AskUserQuestion` 询问用户：
 
@@ -430,7 +572,7 @@ fi
 "ENABLE_LSP_TOOLS": "1"
 ```
 
-#### 4.2 如果缺少语言服务器
+#### 5.2 如果缺少语言服务器
 
 使用 `AskUserQuestion` 询问用户：
 
@@ -483,7 +625,7 @@ xcode-select --install 2>/dev/null || brew install llvm
 - getDiagnostics (诊断信息)
 ```
 
-#### 4.3 如果用户选择跳过
+#### 5.3 如果用户选择跳过
 
 输出：
 ```
@@ -500,11 +642,11 @@ xcode-select --install 2>/dev/null || brew install llvm
 详细指南: doc/claude-lsp-setup.md
 ```
 
-### 阶段 4.5：处理 CLI 多版本安装
+### 阶段 6：处理 CLI 多版本安装
 
 如果检测到 `claude` 或 `codex` CLI 存在多个安装（安装数量 > 1）：
 
-#### 4.5.1 显示多版本详情
+#### 6.1 显示多版本详情
 
 ```
 检测到 CLI 多版本安装
@@ -519,7 +661,7 @@ codex CLI (共 2 个安装):
   - yarn: v0.1.4 ← 当前使用
 ```
 
-#### 4.5.2 询问用户处理方式
+#### 6.2 询问用户处理方式
 
 使用 `AskUserQuestion` 询问用户：
 
@@ -534,7 +676,7 @@ codex CLI (共 2 个安装):
 
 > 注：只显示用户实际安装的选项
 
-#### 4.5.3 执行清理
+#### 6.3 执行清理
 
 **如果用户选择清理**：
 
@@ -558,7 +700,7 @@ yarn global remove @openai/codex
 brew uninstall codex
 ```
 
-#### 4.5.4 升级到最新版本
+#### 6.4 升级到最新版本
 
 清理完成后，使用保留的包管理器升级到最新版本：
 
@@ -580,7 +722,7 @@ brew upgrade claude
 brew upgrade codex
 ```
 
-#### 4.5.5 输出清理结果
+#### 6.5 输出清理结果
 
 ```
 ✅ CLI 多版本清理完成
@@ -596,7 +738,7 @@ codex CLI:
 现在可以正常升级，不会出现版本冲突。
 ```
 
-#### 4.5.6 如果用户选择跳过
+#### 6.6 如果用户选择跳过
 
 输出：
 
@@ -611,7 +753,7 @@ codex CLI:
 如需后续清理，可再次运行 /dx:doctor
 ```
 
-### 阶段 5：处理 codeagent-wrapper 未安装情况
+### 阶段 7：处理 codeagent-wrapper 未安装情况
 
 如果 `codeagent-wrapper` 未安装：
 
@@ -641,7 +783,7 @@ codex CLI:
    https://github.com/cexll/myclaude/blob/master/install.sh
    ```
 
-### 阶段 6：安装失败处理
+### 阶段 8：安装失败处理
 
 如果自动安装失败，输出：
 
@@ -675,6 +817,7 @@ https://github.com/cexll/myclaude/issues
 codeagent-wrapper  | 已安装   | v1.2.3
 codex              | 已安装   | v1.0.0
 gemini             | 已安装   | v2.0.0
+ccstatusline       | 已配置   | npx
 Claude LSP 服务    | 完整     | -
 
 检测到项目语言: TypeScript/JS
@@ -693,6 +836,7 @@ Claude LSP 服务    | 完整     | -
 codeagent-wrapper  | 已安装   | v1.2.3
 codex              | 已安装   | v1.0.0
 gemini             | 未安装   | -
+ccstatusline       | 未配置   | -
 Claude LSP 服务    | 部分     | -
 
 检测到项目语言: TypeScript/JS Python
@@ -702,6 +846,9 @@ LSP 服务器状态:
 
 ⚠️  警告: gemini CLI 未安装
    - 命令参数 --gemini 将无法使用
+
+⚠️  警告: ccstatusline 状态行未配置
+   - 是否要自动配置？
 
 ⚠️  警告: 缺少 Python 的 LSP 服务器 (pyright)
    - 是否要自动安装？
@@ -720,6 +867,7 @@ codeagent-wrapper  | 已安装   | v1.2.3
 claude             | 多版本   | -
 codex              | 多版本   | -
 gemini             | 已安装   | v2.0.0
+ccstatusline       | 已配置   | bunx
 Claude LSP 服务    | 完整     | -
 
 ⚠️  警告: 检测到 claude CLI 存在多个安装 (共 3 个)
@@ -744,6 +892,7 @@ Claude LSP 服务    | 完整     | -
 codeagent-wrapper  | 未安装   | -
 codex              | 未安装   | -
 gemini             | 未安装   | -
+ccstatusline       | 未安装   | -
 Claude LSP 服务    | 未配置   | -
 
 ❌ 错误: codeagent-wrapper 未安装（核心依赖）
@@ -769,6 +918,68 @@ codeagent-wrapper 已成功安装 (v1.2.3)
 - codex 和 gemini CLI 为可选依赖，不影响核心功能
 - 未安装可选 CLI 时，对应的 `--codex` 或 `--gemini` 参数将不可用
 - **多版本检测**：如果通过多个包管理器（npm、pnpm、yarn、brew）安装了同一 CLI，建议清理到只保留一个，避免升级时版本冲突
+- **ccstatusline 插件**：
+  - 无需全局安装，通过 npx/bunx 直接运行
+  - 需在 `~/.claude/settings.json` 中添加 `statusLine` 配置
+  - 配置后立即生效，无需重启 Claude Code
+  - 推荐使用 npx（兼容性好）或 bunx（速度快）
+  - 详细配置: https://github.com/sirmalloc/ccstatusline
+
+## ccstatusline 配置说明
+
+### 什么是 ccstatusline
+
+ccstatusline 是一个 Claude Code 状态行增强插件，提供：
+- 实时状态显示
+- 自定义状态栏内容
+- 交互式配置界面
+- 支持自定义命令和文本
+- 颜色和样式自定义
+
+### 配置方法
+
+1. **在 Claude Code 设置中启用**
+
+   编辑 `~/.claude/settings.json`（Windows: `%USERPROFILE%\.claude\settings.json`）：
+
+   ```json
+   {
+     "statusLine": "npx ccstatusline@latest"
+   }
+   ```
+
+   或使用 bunx（更快，需先安装 bun）：
+
+   ```json
+   {
+     "statusLine": "bunx ccstatusline@latest"
+   }
+   ```
+
+2. **首次运行配置**
+
+   配置后，首次启动 Claude Code 时会显示交互式配置界面：
+   - 自定义状态行显示内容
+   - 配置颜色和样式
+   - 添加自定义命令和文本
+   - 实时预览效果
+
+3. **后续调整**
+
+   配置存储在 `~/.config/ccstatusline/settings.json`，可以：
+   - 重新运行 `npx ccstatusline@latest` 进入配置界面
+   - 直接编辑配置文件
+
+### 特点
+
+- **无需全局安装**：通过 npx/bunx 直接运行，自动获取最新版本
+- **立即生效**：配置后无需重启 Claude Code
+- **轻量级**：不占用系统资源，按需加载
+- **自定义性强**：完全可配置的状态栏内容
+
+### 详细信息
+
+项目主页: https://github.com/sirmalloc/ccstatusline
 
 ## Claude LSP 服务说明
 
