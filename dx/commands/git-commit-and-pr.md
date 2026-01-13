@@ -1,7 +1,7 @@
 ---
 allowed-tools: [Bash, Read, Glob, TodoWrite, Edit, Grep, Task]
 description: '统一 Git 工作流：多代理协作的 Issue/Commit/PR 自动化'
-model: sonnet
+model: haiku
 ---
 
 ## Usage
