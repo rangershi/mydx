@@ -1,0 +1,13 @@
+{
+  "env": {
+    "ENABLE_LSP_TOOLS": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "statusLine": {
+    "command": "npx ccstatusline@latest",
+    "type": "command"
+  },
+    "enabledPlugins": {
+    "dx@dx": true
+  }
+}
