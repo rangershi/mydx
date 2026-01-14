@@ -1,6 +1,6 @@
 ---
 name: codex-review
-description: PR code review via codeagent-wrapper (Codex backend) - direct invocation avoiding telephone game, returns structured ReviewResult JSON
+description: ""
 model: sonnet
 color: green
 tools: Read, Bash, Grep, Glob

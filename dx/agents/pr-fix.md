@@ -1,6 +1,6 @@
 ---
 name: pr-fix
-description: PR fix specialist - receives structured handoff payload, implements fixes (via codeagent-wrapper codex backend or direct), returns FixResult JSON
+description: ""
 tools: Read, Bash, Grep, Glob, Edit, Write
 model: opus
 color: yellow
