@@ -1,6 +1,6 @@
 ---
 name: review
-description: Multi-dimensional code review specialist - returns structured ReviewResult JSON with four-dimension analysis
+description: ""
 tools: Read, Bash, Grep, Glob, TodoWrite
 color: yellow
 model: opus

@@ -1,165 +1,145 @@
 ---
 allowed-tools: [Bash, Read, Glob, TodoWrite, Edit, Grep, Task]
-description: '统一 Git 工作流：多代理协作的 Issue/Commit/PR 自动化'
+description: '统一 Git 工作流：Issue/Commit/PR 自动化'
 model: haiku
 ---
 
-## Usage
+## 用法
 
 ```bash
-/git-commit-and-pr [--issue <ID>] [--message <MSG>]  # 默认：自动执行所需阶段
-/git-commit-and-pr --issue-only [--title <T>] [--labels <l1,l2>]  # 仅创建 Issue
-/git-commit-and-pr --all [--issue <ID>] [--base <BRANCH>]  # 全流程
-/git-commit-and-pr --pr [--issue <ID>] [--base <BRANCH>]  # 仅创建 PR
+/git-commit-and-pr                           # 自动检测并执行所需阶段
+/git-commit-and-pr --issue <ID>              # 指定关联 Issue
+/git-commit-and-pr --issue-only              # 仅创建 Issue
+/git-commit-and-pr --pr --base <BRANCH>      # 仅创建 PR
 ```
 
 ---
 
-## 架构
+## 执行流程
 
-```
-Orchestrator
-├── issue-creator agent     → Issue 创建
-├── quality-guard agent     → 增量预检
-├── commit-composer agent   → 提交生成
-└── pr-composer agent       → PR 创建
-```
+### Step 1: 状态检测
 
-**核心原则**：Agent 直接输出结果，Orchestrator 不做二次合成（避免 Telephone Game）。
-
----
-
-## Phase 0: 状态评估
-
-**并行执行：**
+并行执行：
 ```bash
 git status --short
 git branch --show-current
 git log -1 --format='%H %s' 2>/dev/null || echo "no-commits"
 ```
 
-**模式识别：**
-| 条件 | 执行阶段 |
-|------|----------|
-| 缺 Issue 或 `--issue-only` | Phase 1 |
-| 有未提交修改且非 `--pr` | Phase 2 |
-| 工作树干净且在功能分支 | Phase 3 |
+根据状态决定执行阶段：
+- 无 Issue 或 `--issue-only` → 执行 Issue 创建
+- 有未提交修改 → 执行 Commit 流程
+- 工作树干净且在功能分支 → 执行 PR 创建
 
-**分支规则**：禁止在 main/master 直接提交，功能分支命名 `<type>/<issue-id>-<desc>`
+**禁止在 main/master 直接提交。**
 
 ---
 
-## Phase 1: Issue 创建
+### Step 2: Issue 创建（可选）
 
-**调用 issue-creator agent：**
+**使用 Task 调用 `dx:issue-creator` agent：**
 ```
-输入：git status, git diff --stat, 用户参数 (title/labels/assignees)
-职责：
-1. 从对话历史提取需求背景
-2. 分析代码变更范围
-3. 使用 gh CLI + heredoc 创建 Issue
-4. 直接输出 Issue 编号与链接
+prompt: |
+  分析当前对话历史和代码变更，创建 GitHub Issue。
+
+  用户参数：
+  - title: <用户提供的标题，如有>
+  - labels: <用户提供的标签，如有>
+
+  执行 git diff --stat 获取变更范围。
+  使用 gh issue create 创建 Issue。
+  输出 Issue 编号和链接。
 ```
 
 `--issue-only` 时在此终止。
 
 ---
 
-## Phase 2: Commit 流程
+### Step 3: Commit 流程
 
-### Step 2.1: 质量门禁
+#### 3.1 暂存变更
 
-**调用 quality-guard agent：**
-```
-执行序列（按需）：
-1. ./scripts/dx lint（必跑）
-2. ./scripts/dx build backend（后端改动）
-3. ./scripts/dx build sdk（DTO/API 变更，紧随 backend）
-4. ./scripts/dx build front（前端改动）
-5. ./scripts/dx build admin（admin 改动）
-
-并行：lint ∥ build backend，build front ∥ build admin
-失败时停止并输出修复建议
+```bash
+git add -A
+git diff --cached --stat
 ```
 
-### Step 2.2: 提交生成
+#### 3.2 生成提交
 
-**调用 commit-composer agent：**
-```
-输入：git diff --stat, git diff, Issue ID
-输出格式：
-git commit -F - <<'MSG'
+分析 `git diff --cached` 内容，生成 commit message：
+
+```bash
+git commit -F - <<'EOF'
 <type>: <概要>
 
 变更说明：
-- ...
+- <变更项1>
+- <变更项2>
 
 Refs: #<issue-id>
-MSG
+EOF
+```
 
-执行后 git status 确认工作树干净
+type 类型：feat/fix/refactor/docs/chore/test
+
+#### 3.3 确认提交
+
+```bash
+git status
+git log -1 --oneline
 ```
 
 ---
 
-## Phase 3: PR 创建
+### Step 4: PR 创建
 
-**前置检查**：确认在功能分支且工作树干净，否则回退 Phase 2
+#### 4.1 推送分支
 
-**调用 pr-composer agent：**
+```bash
+git push -u origin HEAD
 ```
-分析：git log <base>..HEAD --oneline, git diff <base>...HEAD --stat
 
-生成：
-1. PR 标题
-2. 变更概览
-3. 测试结果
-4. 风险评估（高风险：main分支/数据库schema/认证支付）
-5. Closes: #<issue-id>
+#### 4.2 分析变更
 
-执行：
-gh pr create --title '<标题>' --body-file - <<'MSG'
+```bash
+git log origin/master..HEAD --oneline
+git diff origin/master...HEAD --stat
+```
+
+#### 4.3 创建 PR
+
+```bash
+gh pr create --title '<type>: <概要>' --body-file - <<'EOF'
 ## 变更说明
-...
-## 测试结果
-...
-## 风险评估
-...
+
+- <变更项>
+
+## 测试
+
+- [ ] 本地测试通过
+
 Closes: #<issue-id>
-MSG
+EOF
 ```
 
 ---
 
-## 输出规范
+## 输出格式
 
 **成功：**
 ```
-✅ 全流程完成
+✅ 完成
 
 Issue: #<编号> <标题>
 Commit: <hash> <主题>
-PR: #<编号> <标题> → <URL>
-
-📋 后续步骤：/dx:pr-review-loop --pr <编号>
+PR: #<编号> → <URL>
 ```
 
 **部分完成：**
 ```
-⚠️ 流程在 [阶段名] 停止
+⚠️ 停止于 [阶段]
 
-已完成：
-- Issue: #<编号>
-
-阻塞原因：<错误摘要>
-修复后重新运行：/git-commit-and-pr --issue <编号>
+已完成：<列表>
+阻塞：<原因>
+继续：/git-commit-and-pr --issue <编号>
 ```
-
----
-
-## 关键约束
-
-- 所有多行文本使用 heredoc，禁止 `-m` 嵌入
-- 增量预检通过是提交前置条件
-- Agent 失败时提供降级策略（跳过/模板/手动命令）
-- 使用 Task tool 调用 agent，优先 codeagent skill (backend: codex)

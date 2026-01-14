@@ -1,6 +1,6 @@
 ---
 name: issue-creator
-description: GitHub Issue 创建专家，自动分析上下文和代码变更，生成结构化的标准 Issue
+description: ""
 model: sonnet
 color: green
 tools: Read, Bash, Grep, Glob, TodoWrite, Edit

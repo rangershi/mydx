@@ -1,6 +1,6 @@
 ---
 name: pr-comments-analyzer
-description: PR Comments Thread Analyzer - extracts unresolved issues from PR discussions and returns structured PendingIssuesResult JSON
+description: ""
 tools: Read, Bash, Grep, Glob
 model: opus
 ---
