@@ -692,7 +692,8 @@ def can_merge(consensus: str, findings: List[Finding], comments_analysis: Pendin
     1. 存在未解决的人工问题 → 禁止（需先解决）
     2. P0 > 0 → 禁止
     3. P1 > 0 → 禁止
-    4. consensus == "approve" → 允许
+    4. P2 > 0 → 禁止
+    5. consensus == "approve" → 允许
     """
     # 存在未解决的人工问题
     if comments_analysis.stats.unresolvedThreads > 0:
@@ -700,8 +701,9 @@ def can_merge(consensus: str, findings: List[Finding], comments_analysis: Pendin
 
     p0 = sum(1 for f in findings if f.priority == "P0")
     p1 = sum(1 for f in findings if f.priority == "P1")
+    p2 = sum(1 for f in findings if f.priority == "P2")
 
-    if p0 > 0 or p1 > 0:
+    if p0 > 0 or p1 > 0 or p2 > 0:
         return False
 
     return consensus == "approve"
@@ -721,7 +723,7 @@ else:
 
   - Agent 评审: 双 Agent 建议合并
   - 人工评论: 无未解决问题
-  - 问题统计: P0=0, P1=0, P2=${p2Count}, P3=${p3Count}
+  - 问题统计: P0=0, P1=0, P2=0, P3=${p3Count}
   ```
 
 - 若需修复：
@@ -736,7 +738,7 @@ else:
   待修复问题: ${allFindings.length} 个
   - P0 (阻断): ${p0Count}
   - P1 (关键): ${p1Count}
-  - P2 (重要): ${p2Count}
+  - P2 (重要): ${p2Count} （所有 P0-P2 问题将自动修复）
   ```
 
 ---
@@ -766,9 +768,9 @@ const fixPayload = {
   prNumber: PR_NUMBER,
   round: ROUND,
 
-  // 必须修复的问题（P0 + P1）
+  // 必须修复的问题（P0 + P1 + P2）
   issuesToFix: allFindings
-    .filter(f => f.priority === "P0" || f.priority === "P1")
+    .filter(f => f.priority === "P0" || f.priority === "P1" || f.priority === "P2")
     .map(f => ({
       id: f.id,
       priority: f.priority,
@@ -787,9 +789,9 @@ const fixPayload = {
       }
     })),
 
-  // 可选修复的问题（P2 + P3）
+  // 可选修复的问题（P3）
   optionalIssues: allFindings
-    .filter(f => f.priority === "P2" || f.priority === "P3")
+    .filter(f => f.priority === "P3")
     .map(f => ({
       id: f.id,
       priority: f.priority,
@@ -1255,7 +1257,9 @@ ${JSON.stringify(fixPayload, null, 2)}
 \`\`\`
 
 ## 修复原则
-- 仅修复 issuesToFix 中的问题，不引入无关变更
+- 必须修复 issuesToFix 中的所有 P0、P1、P2 问题
+- P3 问题（optionalIssues）可选择性修复
+- 不引入无关变更
 - 对无法修复的问题，记录 rejectedIssues 并说明理由
 - 每个 fixedIssue 必须关联 findingId
 
