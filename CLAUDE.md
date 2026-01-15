@@ -15,7 +15,8 @@ mydx/
     ├── commands/           # /dx:* 命令定义 (Markdown)
     ├── agents/             # 通用 Agent 定义
     ├── skills/             # Skills 集成
-    │   ├── codeagent/      # 多后端代码代理 (codex/gemini/claude)
+    │   ├── codex-cli/      # Codex CLI 直接调用
+    │   ├── gemini-cli/     # Gemini CLI 直接调用
     │   └── product-requirements/  # PRD 生成 (90+ 质量门控)
     ├── hooks/hooks.json    # PR 创建后自动触发评审
     ├── bmad/agents/        # BMAD 敏捷工作流 (po/architect/sm/dev/qa/review)
@@ -27,7 +28,7 @@ mydx/
 
 | 命令 | 用途 |
 |------|------|
-| `/dx:doctor` | 环境诊断，检测 codeagent-wrapper 等依赖 |
+| `/dx:doctor` | 环境诊断，检测 Codex CLI、Gemini CLI 等依赖 |
 | `/dx:dev` | 轻量级开发流程（简单任务） |
 | `/dx:feature-dev` | 功能开发（7 阶段流程，中等复杂度） |
 | `/dx:requirements-pilot` | 需求驱动开发（90+ 质量门控） |
@@ -41,26 +42,47 @@ mydx/
 - **--codex**: 深度代码理解、复杂重构、超出上下文承载时使用
 - **--gemini**: 多模态理解、超长上下文
 
-## codeagent-wrapper 使用
+## CLI 直接调用
+
+### Codex CLI
 
 ```bash
-# 单任务
-codeagent-wrapper --backend codex - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 <task>
-EOF
-
-# 并行任务
-codeagent-wrapper --parallel <<'EOF'
----TASK---
-id: task1
-backend: codex
----CONTENT---
-task content
 EOF
 ```
 
+### Gemini CLI
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+<task>
+EOF
+)"
+```
+
+### 并行执行
+
+```bash
+# Task 1
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
+task1 content
+EOF
+) &
+pid1=$!
+
+# Task 2
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
+task2 content
+EOF
+) &
+pid2=$!
+
+wait $pid1 $pid2
+```
+
 **关键规则**:
-- 永远不要 kill codeagent 进程（2-10 分钟运行是正常的）
+- 永远不要 kill CLI 进程（2-10 分钟运行是正常的）
 - 使用 `timeout: 7200000`
 
 ## 开发此插件

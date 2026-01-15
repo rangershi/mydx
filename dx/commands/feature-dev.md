@@ -19,8 +19,8 @@ You are helping a developer implement a new feature. Follow a systematic approac
 | 参数 | 执行模式 | 适用场景 |
 |------|----------|----------|
 | （默认） | 直接执行 | 大多数任务，使用 Task tool 调用 agents |
-| `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要深度推理和 Context Isolation |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
+| `--codex` | 委托 Codex CLI | 复杂任务、需要深度推理和 Context Isolation |
+| `--gemini` | 委托 Gemini CLI | Gemini 后端任务 |
 
 ### 设计原理（基于 Multi-Agent Patterns）
 
@@ -28,7 +28,7 @@ You are helping a developer implement a new feature. Follow a systematic approac
 - **避免 Telephone Game** — 直接调用减少信息传递层级
 - **Context 共享** — Orchestrator 可直接读取 agent 返回的文件列表
 
-**委托模式**使用 codeagent-wrapper，适用于需要 Context Isolation 的场景：
+**委托模式**使用对应 CLI，适用于需要 Context Isolation 的场景：
 - 任务复杂度超出当前上下文承载能力
 - 需要并行执行多个独立任务
 - 需要特定后端的专项能力
@@ -86,33 +86,58 @@ Task tool parameters:
 
 ---
 
-### 2B. --codex/--gemini 模式：使用 codeagent-wrapper
+### 2B. --codex/--gemini 模式：使用 CLI 并行执行
 
-**使用 codeagent-wrapper --parallel 并行执行多个探索任务**：
+**--codex 模式**：使用 Codex CLI 并行执行多个探索任务：
 
 ```bash
-codeagent-wrapper --parallel --backend {codex|gemini} <<'EOF'
----TASK---
-id: explore-similar
-workdir: .
----CONTENT---
+# Task 1: Explore similar features
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Find features similar to [feature] and trace through their implementation comprehensively.
 Return a list of 5-10 key files to read.
+EOF
+) &
+pid1=$!
 
----TASK---
-id: explore-architecture
-workdir: .
----CONTENT---
+# Task 2: Explore architecture
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Map the architecture and abstractions for [feature area], tracing through the code comprehensively.
 Return a list of 5-10 key files to read.
+EOF
+) &
+pid2=$!
 
----TASK---
-id: explore-patterns
-workdir: .
----CONTENT---
+# Task 3: Explore patterns
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Identify UI patterns, testing approaches, or extension points relevant to [feature].
 Return a list of 5-10 key files to read.
 EOF
+) &
+pid3=$!
+
+wait $pid1 $pid2 $pid3
+```
+
+**--gemini 模式**：使用 Gemini CLI 并行执行：
+
+```bash
+# Task 1
+(gemini -o stream-json -y -p "$(cat <<'EOF'
+Find features similar to [feature] and trace through their implementation.
+Return a list of 5-10 key files.
+EOF
+)") &
+pid1=$!
+
+# Task 2
+(gemini -o stream-json -y -p "$(cat <<'EOF'
+Map the architecture for [feature area].
+Return a list of 5-10 key files.
+EOF
+)") &
+pid2=$!
+
+wait $pid1 $pid2
 ```
 
 ---
@@ -196,37 +221,42 @@ Task tool parameters:
 
 ---
 
-### 4B. --codex/--gemini 模式：使用 codeagent-wrapper
+### 4B. --codex/--gemini 模式：使用 CLI 并行设计
 
-**使用 codeagent-wrapper --parallel 并行设计多个方案**：
+**--codex 模式**：使用 Codex CLI 并行设计多个方案：
 
 ```bash
-codeagent-wrapper --parallel --backend {codex|gemini} <<'EOF'
----TASK---
-id: arch-minimal
-workdir: .
----CONTENT---
+# Architecture 1: Minimal changes
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Design architecture for [feature] with focus on minimal changes.
 Prioritize smallest change and maximum reuse of existing code.
 Include specific files to create/modify.
+EOF
+) &
+pid1=$!
 
----TASK---
-id: arch-clean
-workdir: .
----CONTENT---
+# Architecture 2: Clean architecture
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Design architecture for [feature] with focus on clean architecture.
 Prioritize maintainability and elegant abstractions.
 Include specific files to create/modify.
+EOF
+) &
+pid2=$!
 
----TASK---
-id: arch-pragmatic
-workdir: .
----CONTENT---
+# Architecture 3: Pragmatic balance
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Design architecture for [feature] with pragmatic balance.
 Balance speed and quality appropriately.
 Include specific files to create/modify.
 EOF
+) &
+pid3=$!
+
+wait $pid1 $pid2 $pid3
 ```
+
+**--gemini 模式**：类似方式使用 `gemini -o stream-json -y -p "$(cat <<'EOF' ... EOF)"`
 
 ---
 
@@ -262,10 +292,10 @@ EOF
 
 ### 5B. --codex/--gemini 模式：委托实现
 
-**使用 codeagent-wrapper 委托实现**：
+**--codex 模式**：使用 Codex CLI 委托实现：
 
 ```bash
-codeagent-wrapper --backend {codex|gemini} - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 Implement [feature] following the chosen architecture.
 
 ## Architecture Decision
@@ -285,8 +315,27 @@ Implement [feature] following the chosen architecture.
 EOF
 ```
 
-**⚠️ Critical Rules（来自 codeagent SKILL.md）**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
+**--gemini 模式**：使用 Gemini CLI 委托实现：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+Implement [feature] following the chosen architecture.
+
+## Architecture Decision
+[Insert chosen architecture from Phase 4]
+
+## Files to Create/Modify
+[List from architecture design]
+
+## Requirements
+- Follow codebase conventions strictly
+- Write clean, well-documented code
+EOF
+)"
+```
+
+**⚠️ Critical Rules**：
+- **NEVER kill CLI processes** — 长时间运行是正常的（通常 2-10 分钟）
 - `timeout: 7200000`（固定值）
 
 ## Phase 6: Quality Review
@@ -314,37 +363,42 @@ Task tool parameters:
 
 ---
 
-### 6B. --codex/--gemini 模式：使用 codeagent-wrapper
+### 6B. --codex/--gemini 模式：使用 CLI 并行审查
 
-**使用 codeagent-wrapper --parallel 并行执行代码审查**：
+**--codex 模式**：使用 Codex CLI 并行执行代码审查：
 
 ```bash
-codeagent-wrapper --parallel --backend {codex|gemini} <<'EOF'
----TASK---
-id: review-simplicity
-workdir: .
----CONTENT---
+# Review 1: Simplicity
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Review the recent code changes for simplicity, DRY principles, and elegance.
 Report issues with confidence >= 80 only.
 Include file:line references for each issue.
+EOF
+) &
+pid1=$!
 
----TASK---
-id: review-bugs
-workdir: .
----CONTENT---
+# Review 2: Bugs
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Review the recent code changes for bugs and functional correctness.
 Report issues with confidence >= 80 only.
 Include file:line references for each issue.
+EOF
+) &
+pid2=$!
 
----TASK---
-id: review-conventions
-workdir: .
----CONTENT---
+# Review 3: Conventions
+(codex e -C . --skip-git-repo-check --json - <<'EOF'
 Review the recent code changes for project conventions and abstractions.
 Report issues with confidence >= 80 only.
 Include file:line references for each issue.
 EOF
+) &
+pid3=$!
+
+wait $pid1 $pid2 $pid3
 ```
+
+**--gemini 模式**：类似方式使用 `gemini -o stream-json -y -p "$(cat <<'EOF' ... EOF)"`
 
 ---
 

@@ -19,8 +19,8 @@ You are a **Bug Resolution Specialist** focused on analyzing, understanding, and
 | EXECUTION_MODE | 执行方式 | 说明 |
 |----------------|----------|------|
 | `direct` (默认) | 直接执行 | 使用 Edit/Write 等工具直接修复代码 |
-| `codex` | 委托 codeagent-wrapper (Codex) | 复杂调试任务 |
-| `gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
+| `codex` | 委托 Codex CLI | 复杂调试任务 |
+| `gemini` | 委托 Gemini CLI | Gemini 后端任务 |
 
 ### 执行方式选择
 
@@ -28,11 +28,11 @@ You are a **Bug Resolution Specialist** focused on analyzing, understanding, and
 - 使用 Glob, Grep, Read 工具分析代码
 - 使用 Edit, Write, MultiEdit 工具直接修复
 
-**如果 EXECUTION_MODE 为 `codex` 或 `gemini`**：
-- 使用 codeagent-wrapper 委托执行：
+**如果 EXECUTION_MODE 为 `codex`**：
+- 使用 Codex CLI 委托执行：
 
 ```bash
-codeagent-wrapper --backend {codex|gemini} - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 Bug Analysis and Fix Task
 
 Error Description:
@@ -52,8 +52,27 @@ Deliverables:
 EOF
 ```
 
+**如果 EXECUTION_MODE 为 `gemini`**：
+- 使用 Gemini CLI 委托执行：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+Bug Analysis and Fix Task
+
+Error Description:
+[error description from orchestrator]
+
+Tasks:
+1. Analyze root cause of the bug
+2. Design minimal, targeted fix
+3. Implement code changes
+4. Document changes and rationale
+EOF
+)"
+```
+
 **⚠️ Critical Rules（委托模式）**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
+- **NEVER kill CLI processes** — 长时间运行是正常的（通常 2-10 分钟）
 - `timeout: 7200000`（固定值）
 
 ---

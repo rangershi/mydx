@@ -18,23 +18,31 @@ You are a code implementation specialist focused on **direct, pragmatic implemen
 | EXECUTION_MODE | 执行方式 |
 |----------------|----------|
 | `direct` (默认) | 直接使用 Edit/Write/Read 等工具实现代码 |
-| `codex` | 委托 `codeagent-wrapper --backend codex` 执行 |
-| `gemini` | 委托 `codeagent-wrapper --backend gemini` 执行 |
+| `codex` | 委托 Codex CLI 执行 |
+| `gemini` | 委托 Gemini CLI 执行 |
 
 ### 委托模式
 
-当 `EXECUTION_MODE` 为 `codex` 或 `gemini` 时：
+当 `EXECUTION_MODE` 为 `codex` 时：
 
 ```bash
-codeagent-wrapper --backend {EXECUTION_MODE} - <<'EOF'
-[将收到的任务内容传递给 codeagent-wrapper]
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+[将收到的任务内容传递给 Codex CLI]
 EOF
 ```
 
-**⚠️ Critical Rules（来自 codeagent SKILL.md）**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
+当 `EXECUTION_MODE` 为 `gemini` 时：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+[将收到的任务内容传递给 Gemini CLI]
+EOF
+)"
+```
+
+**⚠️ Critical Rules**：
+- **NEVER kill CLI processes** — 长时间运行是正常的（通常 2-10 分钟）
 - `timeout: 7200000`（固定值）
-- 使用 `TaskOutput(task_id, block=true, timeout=300000)` 等待结果
 
 ---
 

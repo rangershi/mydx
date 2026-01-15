@@ -10,15 +10,15 @@ OmO (Oh-My-OpenCode) is a multi-agent orchestration skill that uses Sisyphus as 
 
 ## Agent Hierarchy
 
-| Agent | Role | Backend | Model |
-|-------|------|---------|-------|
-| sisyphus | Primary orchestrator | claude | claude-sonnet-4-20250514 |
-| oracle | Technical advisor (EXPENSIVE) | claude | claude-sonnet-4-20250514 |
-| librarian | External research | claude | claude-sonnet-4-5-20250514 |
-| explore | Codebase search (FREE) | opencode | opencode/grok-code |
-| develop | Code implementation | codex | (default) |
-| frontend-ui-ux-engineer | UI/UX specialist | gemini | gemini-3-pro-preview |
-| document-writer | Documentation | gemini | gemini-3-flash-preview |
+| Agent | Role | Execution Method |
+|-------|------|------------------|
+| sisyphus | Primary orchestrator | Claude Code (current context) |
+| oracle | Technical advisor (EXPENSIVE) | Task tool (subagent_type: "general-purpose") |
+| librarian | External research | Task tool (subagent_type: "Explore") |
+| explore | Codebase search (FREE) | Task tool (subagent_type: "Explore") |
+| develop | Code implementation | Codex CLI or Gemini CLI |
+| frontend-ui-ux-engineer | UI/UX specialist | Gemini CLI |
+| document-writer | Documentation | Gemini CLI |
 
 ## How It Works
 
@@ -26,7 +26,7 @@ OmO (Oh-My-OpenCode) is a multi-agent orchestration skill that uses Sisyphus as 
 2. Sisyphus analyzes your request via Intent Gate
 3. Based on task type, Sisyphus either:
    - Executes directly (simple tasks)
-   - Delegates to specialized agents (complex tasks)
+   - Delegates to specialized agents via Task tool (complex tasks)
    - Fires parallel agents (exploration)
 
 ## Examples
@@ -44,30 +44,36 @@ OmO (Oh-My-OpenCode) is a multi-agent orchestration skill that uses Sisyphus as 
 
 ## Agent Delegation
 
-Sisyphus delegates via codeagent-wrapper:
+Sisyphus delegates via Claude Code's Task tool:
 
-```bash
-codeagent-wrapper --agent oracle - . <<'EOF'
-Analyze the authentication architecture.
-EOF
 ```
+# Delegate to oracle for architecture advice
+Task tool:
+- subagent_type: "general-purpose"
+- prompt: |
+    You are oracle, a technical advisor...
+    Analyze the authentication architecture.
 
-## Configuration
+# Delegate to explore for codebase search
+Task tool:
+- subagent_type: "Explore"
+- prompt: Find all authentication-related files...
 
-Agent-model mappings are configured in `~/.codeagent/models.json`:
+# Delegate to develop for code implementation (Codex)
+Bash tool:
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+Implement the authentication module...
+EOF
 
-```json
-{
-  "default_backend": "opencode",
-  "default_model": "opencode/grok-code",
-  "agents": {
-    "sisyphus": {"backend": "claude", "model": "claude-sonnet-4-20250514"},
-    "oracle": {"backend": "claude", "model": "claude-sonnet-4-20250514"}
-  }
-}
+# Delegate to frontend-ui-ux-engineer (Gemini)
+Bash tool:
+gemini -o stream-json -y -p "$(cat <<'EOF'
+Design the login form UI...
+EOF
+)"
 ```
 
 ## Requirements
 
-- codeagent-wrapper with `--agent` support
-- Backend CLIs: claude, opencode, gemini
+- Claude Code with Task tool support
+- Backend CLIs: codex, gemini (optional, for specific agents)

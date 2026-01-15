@@ -19,8 +19,8 @@ You are a **Fix Validation Specialist** responsible for independently assessing 
 | EXECUTION_MODE | 执行方式 | 说明 |
 |----------------|----------|------|
 | `direct` (默认) | 直接执行 | 使用 Read/Grep 等工具直接验证 |
-| `codex` | 委托 codeagent-wrapper (Codex) | 复杂验证任务 |
-| `gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
+| `codex` | 委托 Codex CLI | 复杂验证任务 |
+| `gemini` | 委托 Gemini CLI | Gemini 后端任务 |
 
 ### 执行方式选择
 
@@ -28,11 +28,11 @@ You are a **Fix Validation Specialist** responsible for independently assessing 
 - 使用 Glob, Grep, Read 工具分析代码变更
 - 使用 Bash 工具运行测试验证
 
-**如果 EXECUTION_MODE 为 `codex` 或 `gemini`**：
-- 使用 codeagent-wrapper 委托执行：
+**如果 EXECUTION_MODE 为 `codex`**：
+- 使用 Codex CLI 委托执行：
 
 ```bash
-codeagent-wrapper --backend {codex|gemini} - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 Fix Validation Task
 
 Error Description:
@@ -54,8 +54,24 @@ Deliverables:
 EOF
 ```
 
+**如果 EXECUTION_MODE 为 `gemini`**：
+- 使用 Gemini CLI 委托执行：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+Fix Validation Task
+
+Tasks:
+1. Verify the fix addresses the root cause
+2. Assess code quality and maintainability
+3. Analyze regression risks
+4. Provide quality score (0-100%)
+EOF
+)"
+```
+
 **⚠️ Critical Rules（委托模式）**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
+- **NEVER kill CLI processes** — 长时间运行是正常的（通常 2-10 分钟）
 - `timeout: 7200000`（固定值）
 
 ---

@@ -12,7 +12,7 @@ description: '多轮 PR 评审与自动修复编排流程'
 # 显式指定 PR 编号
 /pr-review-loop --pr <PR_NUMBER>
 
-# 使用 nocodex 模式（pr-fix 直接执行修复，不委托 codeagent-wrapper）
+# 使用 nocodex 模式（pr-fix 直接执行修复，不委托 Codex CLI）
 /pr-review-loop --nocodex
 /pr-review-loop --pr <PR_NUMBER> --nocodex
 ```
@@ -418,7 +418,7 @@ def calculate_risk_level(findings: List[Finding]) -> str:
 
 2. 检查是否指定 `--nocodex` 标志
    - 若提供：设置 `USE_NOCODEX = true`，pr-fix 将直接执行修复
-   - 若未提供：设置 `USE_NOCODEX = false`，pr-fix 将委托 codeagent-wrapper
+   - 若未提供：设置 `USE_NOCODEX = false`，pr-fix 将委托 Codex CLI
 
 3. 若未提供 `--pr`，自动识别当前分支对应的 PR：
    ```bash
@@ -861,7 +861,7 @@ Task 调用:
 
 | 模式 | 条件 | pr-fix 行为 |
 |------|------|-------------|
-| **默认模式** | `USE_NOCODEX = false` | pr-fix 委托 codeagent-wrapper 执行修复 |
+| **默认模式** | `USE_NOCODEX = false` | pr-fix 委托 Codex CLI 执行修复 |
 | **nocodex 模式** | `USE_NOCODEX = true` | pr-fix 直接执行修复，减少代理层开销 |
 
 **nocodex 模式适用场景**：
@@ -1264,7 +1264,7 @@ ${JSON.stringify(fixPayload, null, 2)}
 - 每个 fixedIssue 必须关联 findingId
 
 ## 执行模式
-- **默认模式**：pr-fix 委托 codeagent-wrapper 执行修复（适合复杂问题）
+- **默认模式**：pr-fix 委托 Codex CLI 执行修复（适合复杂问题）
 - **nocodex 模式**：当 prompt 中包含 "nocodex" 时，pr-fix 直接执行修复（适合简单明确的修复）
 ```
 
@@ -1304,7 +1304,7 @@ ${JSON.stringify(fixPayload, null, 2)}
 ### nocodex 模式
 
 - 通过 `--nocodex` 参数启用
-- 启用后，pr-fix Agent 将直接执行修复，而非委托 codeagent-wrapper
+- 启用后，pr-fix Agent 将直接执行修复，而非委托 Codex CLI
 - **适用场景**：问题简单明确、修复建议具体、不需要复杂推理
 - **优势**：减少 Context Isolation 开销、避免 Telephone Game、降低 token 消耗（约 15×）
 - **参数传递**：Orchestrator 在调用 pr-fix 时需在 prompt 中包含 "nocodex" 关键字
