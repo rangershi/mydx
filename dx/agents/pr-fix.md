@@ -19,7 +19,7 @@ color: yellow
 | **输入** | `fixPayload` JSON（包含 issuesToFix 数组）+ 可选 `nocodex` 标志 |
 | **输出** | `FixResult` JSON（包含修复结果和 commit 信息） |
 | **边界** | ✅ 可修改代码并提交 |
-| **执行模式** | 默认委托 codeagent-wrapper，`nocodex` 时直接执行 |
+| **执行模式** | 默认委托 Codex CLI，`nocodex` 时直接执行 |
 
 
 ## 前置条件
@@ -27,7 +27,7 @@ color: yellow
 - 调用者必须在 prompt 中提供：
   1. PR 编号
   2. `fixPayload` JSON（Structured Handoff）
-  3. （可选）`nocodex` 标志 — 指定后直接执行修复，不委托 codeagent-wrapper
+  3. （可选）`nocodex` 标志 — 指定后直接执行修复，不委托 Codex CLI
 - 如未提供必要参数，输出 `❌ 错误：缺少必要参数` 并退出
 
 ## 输入 Schema（Structured Handoff Payload）
@@ -77,14 +77,14 @@ const useDirectMode = prompt.includes('nocodex');
 
 ---
 
-#### 2A. 默认模式：委托 codeagent-wrapper
+#### 2A. 默认模式：委托 Codex CLI
 
-**使用 HEREDOC 语法调用 codeagent-wrapper（Codex 后端），避免 Telephone Game（传声筒效应）**：
+**使用 HEREDOC 语法调用 Codex CLI，避免 Telephone Game（传声筒效应）**：
 
 > **注意**：以下示例使用 `<<'EOF'` 语法，其中 `${...}` 为模板占位符，实际调用时需在 shell 中动态构建命令字符串或使用 `<<EOF`（无引号）以允许变量展开。
 
 ```bash
-codeagent-wrapper --backend codex - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 ## 任务
 
 根据以下结构化问题列表实施代码修复：
@@ -120,10 +120,10 @@ ${JSON.stringify(sortedIssues, null, 2)}
 EOF
 ```
 
-**Bash 工具参数**（参考 @skills/codeagent/SKILL.md）：
-- `command: codeagent-wrapper --backend codex - <<'EOF' ... EOF`
+**Bash 工具参数**：
+- `command: codex e -C . --skip-git-repo-check --json - <<'EOF' ... EOF`
 - `timeout: 7200000`（固定值，不可更改）
-- `description: Codeagent PR fix for #${prNumber}`
+- `description: Codex PR fix for #${prNumber}`
 
 **返回格式**：
 ```
@@ -133,9 +133,8 @@ Agent response text here...
 SESSION_ID: 019a7247-ac9d-71f3-89e2-a823dbd8fd14
 ```
 
-**⚠️ Critical Rules（来自 SKILL.md）**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
-- 检查任务状态：`tail -f /tmp/claude/<workdir>/tasks/<task_id>.output`
+**⚠️ Critical Rules**：
+- **NEVER kill codex processes** — 长时间运行是正常的（通常 2-10 分钟）
 - 使用 `TaskOutput(task_id, block=true, timeout=300000)` 等待结果
 
 ---
@@ -266,12 +265,12 @@ interface FixResult {
 
 | 模式 | 触发条件 | 执行方式 | 适用场景 |
 |------|----------|----------|----------|
-| **默认模式** | 未指定 `nocodex` | 委托 `codeagent-wrapper --backend codex` | 复杂修复、需要深度推理 |
+| **默认模式** | 未指定 `nocodex` | 委托 `codex e -C . --skip-git-repo-check --json` | 复杂修复、需要深度推理 |
 | **nocodex 模式** | prompt 中包含 `nocodex` | 直接执行修复 | 简单明确的修复、减少开销 |
 
 ### 模式设计原理（基于 Multi-Agent Patterns）
 
-**默认模式**遵循 Supervisor 模式，将修复任务委托给 `codeagent-wrapper --backend codex` 执行，适合需要复杂推理的场景。
+**默认模式**遵循 Supervisor 模式，将修复任务委托给 Codex CLI 执行，适合需要复杂推理的场景。
 
 **nocodex 模式**消除了代理层，直接在当前上下文执行：
 - **减少 Context Isolation 开销** — 无需在代理间传递上下文
@@ -280,7 +279,7 @@ interface FixResult {
 
 ## 关键约束
 
-- ⛔ **不通过 Skill 工具调用** — 默认模式使用 `codeagent-wrapper --backend codex` HEREDOC，nocodex 模式直接执行
+- ⛔ **不通过 Skill 工具调用** — 默认模式使用 `codex e -C . --skip-git-repo-check --json` HEREDOC，nocodex 模式直接执行
 - ⛔ **不发布评论到 GitHub** — 由 Orchestrator 统一发布综合报告
 - ✅ **使用 Structured Handoff** — 从 Payload 获取问题列表，不重新调用 `gh pr view`
 - ✅ **必须返回 JSON 格式** — 用于 Orchestrator 验证修复结果

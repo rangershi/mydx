@@ -2,8 +2,8 @@
 `/dx:code <FEATURE_DESCRIPTION> [OPTIONS]`
 
 ### Options
-- `--codex`: Use codeagent-wrapper (Codex backend) for execution
-- `--gemini`: Use codeagent-wrapper (Gemini backend) for execution
+- `--codex`: Use Codex CLI for execution
+- `--gemini`: Use Gemini CLI for execution
 
 ---
 
@@ -14,8 +14,8 @@
 | 参数 | 执行方式 | 适用场景 |
 |------|----------|----------|
 | （默认） | Claude 直接执行 | 大多数代码生成任务 |
-| `--codex` | 委托 codeagent-wrapper (Codex) | 复杂实现、需要 Context Isolation |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
+| `--codex` | 委托 Codex CLI | 复杂实现、需要 Context Isolation |
+| `--gemini` | 委托 Gemini CLI | Gemini 后端任务 |
 
 ### 模式传递机制
 
@@ -26,7 +26,7 @@
 
 2. 根据 `EXECUTION_MODE` 决定执行方式：
    - `direct`: 使用 Edit/Write/Read 等工具直接执行
-   - `codex`/`gemini`: 委托给 `codeagent-wrapper --backend {mode}`
+   - `codex`/`gemini`: 委托给对应 CLI 执行
 
 ---
 
@@ -71,10 +71,10 @@ Break down feature requirements and identify technical constraints.
 
 #### 2B. --codex/--gemini 模式：委托执行
 
-**使用 codeagent-wrapper 委托实现**：
+**--codex 模式**：使用 Codex CLI 委托实现：
 
 ```bash
-codeagent-wrapper --backend {codex|gemini} - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 Feature: [feature description]
 
 Context:
@@ -94,10 +94,33 @@ Deliverables:
 EOF
 ```
 
+**--gemini 模式**：使用 Gemini CLI 委托实现：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+Feature: [feature description]
+
+Context:
+- Existing codebase patterns: [patterns discovered]
+- Project constraints: [constraints]
+
+Tasks:
+1. Design API contracts and data models
+2. Implement core functionality with error handling
+3. Ensure integration with existing systems
+4. Validate code quality and security
+
+Deliverables:
+- Working implementation with comprehensive comments
+- Integration with existing codebase
+- Testing strategy and validation approach
+EOF
+)"
+```
+
 **⚠️ Critical Rules**：
-- **NEVER kill codeagent processes** — 长时间运行是正常的（通常 2-10 分钟）
+- **NEVER kill CLI processes** — 长时间运行是正常的（通常 2-10 分钟）
 - `timeout: 7200000`（固定值）
-- 使用 `TaskOutput(task_id, block=true, timeout=300000)` 等待结果
 
 ---
 

@@ -105,7 +105,7 @@ Identify as: Claude Analysis
 ```
 Use Bash tool (run_in_background: true):
 
-codeagent-wrapper --backend codex - <<'EOF'
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 You are a Technical Question Analyser.
 
 Question: [QUESTION]
@@ -127,7 +127,7 @@ timeout: 7200000
 ```
 Use Bash tool (run_in_background: true):
 
-codeagent-wrapper --backend gemini - <<'EOF'
+gemini -o stream-json -y -p "$(cat <<'EOF'
 You are a Technical Question Analyser.
 
 Question: [QUESTION]
@@ -141,6 +141,7 @@ Analyze this technical question and provide:
 
 Be thorough but pragmatic. Follow KISS and YAGNI principles.
 EOF
+)"
 
 timeout: 7200000
 ```
@@ -221,7 +222,7 @@ TaskOutput(task_id="<id>", block=true, timeout=300000)
 ## Critical Rules
 
 1. **并行执行**: 使用 `run_in_background: true` 确保任务并行
-2. **不要 kill 进程**: codeagent-wrapper 任务可能需要 2-10 分钟，这是正常的
+2. **不要 kill 进程**: CLI 任务可能需要 2-10 分钟，这是正常的
 3. **等待完成**: 使用 TaskOutput 等待所有任务完成再整合
 4. **保留原始输出**: 整合时保留各分析的关键见解，避免 "telephone game" 失真
 

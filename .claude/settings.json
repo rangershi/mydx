@@ -8,6 +8,7 @@
     "type": "command"
   },
     "enabledPlugins": {
-    "dx@dx": true
+    "dx@dx": true,
+     "plugin-dev@claude-plugins-official":true
   }
 }

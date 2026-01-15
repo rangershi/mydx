@@ -19,7 +19,7 @@
 /dx:doctor
 ```
 
-该命令会检测 `codeagent-wrapper` 等必要工具是否已安装，如未安装会提示自动安装。
+该命令会检测 `codex`、`gemini` 等 CLI 工具是否已安装，如未安装会提示安装方法。
 
 ### 2. 安装插件
 
@@ -142,13 +142,13 @@ git clone https://github.com/rangershi/mydx.git .claude-plugin/mydx
 
 ### PR 评审循环 (`/dx:pr-review-loop`) - 特殊说明
 
-> **注意**：此命令与其他命令不同，**默认使用 Codex (codeagent-wrapper)** 进行代码修复，而非 Claude。
+> **注意**：此命令与其他命令不同，**默认使用 Codex CLI** 进行代码修复，而非 Claude。
 >
 > 这是因为 PR 评审循环涉及多轮复杂修复，使用 Codex 可以更好地处理 Context Isolation。
 
 | 参数 | 说明 |
 |------|------|
-| (默认) | 使用 Codex (codeagent-wrapper) 执行代码修复 |
+| (默认) | 使用 Codex CLI 执行代码修复 |
 | `--nocodex` | 使用 Claude 当前模型直接执行修复 |
 
 **示例**：
@@ -377,28 +377,37 @@ User Query -> Orchestrator -> [Parallel Analysers] -> Aggregation -> Final Outpu
 
 Skills 提供专业领域知识和外部工具集成能力。
 
-### codeagent (`skills/codeagent/`)
+### codex-cli (`skills/codex-cli/`)
 
-统一的多后端代码代理封装，通过 `codeagent-wrapper` 调用不同的 AI 后端。
+通过 Codex CLI 执行复杂代码任务。
 
 **核心命令**:
 ```bash
-codeagent-wrapper --backend {codex|gemini|claude} "task description"
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+<task description>
+EOF
 ```
-
-**支持的后端**:
-
-| 后端 | 擅长领域 |
-|------|----------|
-| `codex` | 深度代码理解、复杂算法、大规模重构 |
-| `gemini` | 多模态理解、长上下文处理、创意生成 |
-| `claude` | 通用任务、文档生成、快速迭代 |
-
-> 详细的后端能力对比请参考上方「执行模式 > 各后端能力特点」部分。
 
 **关键规则**:
 - 长时间运行是正常的（2-10 分钟）
-- **永远不要 kill codeagent 进程**
+- **永远不要 kill codex 进程**
+- 使用 `timeout: 7200000` 配置
+
+### gemini-cli (`skills/gemini-cli/`)
+
+通过 Gemini CLI 执行多模态或长上下文任务。
+
+**核心命令**:
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+<task description>
+EOF
+)"
+```
+
+**关键规则**:
+- 长时间运行是正常的（2-10 分钟）
+- **永远不要 kill gemini 进程**
 - 使用 `timeout: 7200000` 配置
 
 ### product-requirements (`skills/product-requirements/`)
@@ -434,7 +443,9 @@ mydx/
 │   ├── commands/           # 所有命令定义（统一 /dx:* 前缀）
 │   ├── agents/             # 通用 Agent 定义
 │   ├── skills/             # Skills 定义
-│   │   ├── codeagent/      # 多后端代码代理 (codex/gemini/claude)
+│   │   ├── codex-cli/      # Codex CLI 集成
+│   │   ├── gemini-cli/     # Gemini CLI 集成
+│   │   ├── omo/            # OmO 多智能体协作
 │   │   └── product-requirements/  # 产品需求处理
 │   ├── hooks/              # Hooks 配置（标准 Claude Code 格式）
 │   ├── bmad/               # BMAD 敏捷工作流
@@ -462,7 +473,7 @@ mydx/
 
 本项目大量代码来源于以下项目，在此表示感谢：
 
-- [cexll/myclaude](https://github.com/cexll/myclaude) - 本项目的主要代码基础，包括 codeagent-wrapper、命令、Agent 等核心组件
+- [cexll/myclaude](https://github.com/cexll/myclaude) - 本项目的主要代码基础，包括命令、Agent 等核心组件
 - [Anthropic Claude Code](https://claude.ai/claude-code) - Claude Code 官方插件系统和最佳实践
 
 ## License

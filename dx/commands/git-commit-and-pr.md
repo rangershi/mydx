@@ -127,7 +127,7 @@ EOF
 创建 PR 成功后，提醒用户运行自动评审流程：
 ```
 💡 提示：运行以下命令启动自动评审
-/pr-review-loop --pr <PR_NUMBER>
+/dx:pr-review-loop --pr <PR_NUMBER>
 ```
 
 ---
@@ -143,7 +143,7 @@ Commit: <hash> <主题>
 PR: #<编号> → <URL>
 
 💡 下一步：运行以下命令启动自动评审
-/pr-review-loop --pr <编号>
+/dx:pr-review-loop --pr <编号>
 ```
 
 **部分完成：**
@@ -152,5 +152,5 @@ PR: #<编号> → <URL>
 
 已完成：<列表>
 阻塞：<原因>
-继续：/git-commit-and-pr --issue <编号>
+继续：/dx:git-commit-and-pr --issue <编号>
 ```

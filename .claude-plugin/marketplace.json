@@ -75,7 +75,8 @@
         "./requirements-driven-workflow/agents/requirements-review.md"
       ],
       "skills": [
-        "./skills/codeagent/SKILL.md",
+        "./skills/codex-cli/SKILL.md",
+        "./skills/gemini-cli/SKILL.md",
         "./skills/product-requirements/SKILL.md",
         "./skills/omo/SKILL.md"
       ],

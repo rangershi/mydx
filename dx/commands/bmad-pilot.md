@@ -5,8 +5,8 @@
 - `--skip-tests`: Skip QA testing phase
 - `--direct-dev`: Skip SM planning, go directly to development after architecture
 - `--skip-scan`: Skip initial repository scanning (not recommended)
-- `--codex`: Agents use codeagent-wrapper (Codex backend) for execution
-- `--gemini`: Agents use codeagent-wrapper (Gemini backend) for execution
+- `--codex`: Agents use Codex CLI for execution
+- `--gemini`: Agents use Gemini CLI for execution
 
 ---
 
@@ -17,8 +17,8 @@
 | 参数 | Agent 执行方式 | 适用场景 |
 |------|----------------|----------|
 | （默认） | Agent 直接执行 | 大多数任务，避免 Telephone Game |
-| `--codex` | Agent 委托 codeagent-wrapper (Codex) | 复杂任务、需要 Context Isolation |
-| `--gemini` | Agent 委托 codeagent-wrapper (Gemini) | Gemini 后端任务 |
+| `--codex` | Agent 委托 Codex CLI | 复杂任务、需要 Context Isolation |
+| `--gemini` | Agent 委托 Gemini CLI | Gemini 后端任务 |
 
 ### 模式传递机制
 
@@ -31,7 +31,7 @@
 
 3. Agent 根据 `EXECUTION_MODE` 决定执行方式：
    - `direct`: 使用 Edit/Write/Read 等工具直接执行
-   - `codex`/`gemini`: 委托给 `codeagent-wrapper --backend {mode}`
+   - `codex`/`gemini`: 委托给对应 CLI 执行
 
 ---
 

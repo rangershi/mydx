@@ -594,92 +594,72 @@ When `/omo` is invoked:
    - Delegates to specialized agents (complex tasks)
    - Fires parallel background agents (exploration)
 
-## Delegation via codeagent
+## Delegation via Task tool
 
-Sisyphus delegates to other agents using codeagent-wrapper with HEREDOC syntax:
+Sisyphus delegates to other agents using Claude Code's Task tool:
 
-```bash
+```
 # Delegate to oracle for architecture advice
-codeagent-wrapper --agent oracle - . <<'EOF'
-Analyze the authentication architecture and recommend improvements.
-Focus on security patterns and scalability.
-EOF
+Use Task tool:
+- subagent_type: "general-purpose"
+- prompt: |
+    You are oracle, a technical advisor specializing in architecture.
 
-# Delegate to librarian for external research
-codeagent-wrapper --agent librarian - . <<'EOF'
-Find best practices for JWT token refresh in Express.js.
-Include official documentation and community patterns.
-EOF
+    Analyze the authentication architecture and recommend improvements.
+    Focus on security patterns and scalability.
 
 # Delegate to explore for codebase search
-codeagent-wrapper --agent explore - . <<'EOF'
-Find all authentication-related files and middleware.
-Map the auth flow from request to response.
-EOF
+Use Task tool:
+- subagent_type: "Explore"
+- prompt: |
+    Find all authentication-related files and middleware.
+    Map the auth flow from request to response.
 
 # Delegate to develop for code implementation
-codeagent-wrapper --agent develop - . <<'EOF'
-Implement the JWT refresh token endpoint.
-Follow existing auth patterns in the codebase.
-EOF
+Use Task tool:
+- subagent_type: "general-purpose"
+- prompt: |
+    You are develop, a code implementation specialist.
 
-# Delegate to frontend engineer for UI work
-codeagent-wrapper --agent frontend-ui-ux-engineer - . <<'EOF'
-Redesign the login form with modern styling.
-Use existing design system tokens.
-EOF
-
-# Delegate to document writer for docs
-codeagent-wrapper --agent document-writer - . <<'EOF'
-Create API documentation for the auth endpoints.
-Include request/response examples.
-EOF
+    Implement the JWT refresh token endpoint.
+    Follow existing auth patterns in the codebase.
 ```
 
-**Invocation Pattern**:
+**Task Tool Parameters**:
 ```
-Bash tool parameters:
-- command: codeagent-wrapper --agent <agent> - [working_dir] <<'EOF'
-  <task content>
-  EOF
+Task tool parameters:
+- subagent_type: "general-purpose" or "Explore" or "Plan"
+- prompt: <agent role + task content>
+- run_in_background: true (for parallel execution)
 - timeout: 7200000
-- description: <brief description>
 ```
 
 ## Parallel Agent Execution
 
-For tasks requiring multiple agents simultaneously, use `--parallel` mode:
+For tasks requiring multiple agents simultaneously, launch multiple Task tools in parallel:
 
-```bash
-codeagent-wrapper --parallel <<'EOF'
----TASK---
-id: explore-auth
-agent: explore
-workdir: /path/to/project
----CONTENT---
-Find all authentication-related files and middleware.
-Map the auth flow from request to response.
----TASK---
-id: research-jwt
-agent: librarian
----CONTENT---
-Find best practices for JWT token refresh in Express.js.
-Include official documentation and community patterns.
----TASK---
-id: design-ui
-agent: frontend-ui-ux-engineer
-dependencies: explore-auth
----CONTENT---
-Design login form based on auth flow analysis.
-Use existing design system tokens.
-EOF
+```
+# Launch multiple agents in parallel using run_in_background: true
+# Then wait for all to complete using TaskOutput
+
+# Agent 1: Explore
+Task tool (run_in_background: true):
+- subagent_type: "Explore"
+- prompt: "Find all authentication-related files..."
+
+# Agent 2: Research
+Task tool (run_in_background: true):
+- subagent_type: "general-purpose"
+- prompt: "You are librarian... Find best practices for JWT..."
+
+# Agent 3: Design (after Agent 1 completes)
+# Wait for Agent 1, then launch Agent 3
 ```
 
 **Parallel Execution Features**:
-- Independent tasks run concurrently
-- `dependencies` field ensures execution order when needed
-- Each task can specify different `agent` (backend+model resolved automatically)
-- Set `CODEAGENT_MAX_PARALLEL_WORKERS` to limit concurrency (default: unlimited)
+- Use `run_in_background: true` for concurrent execution
+- Use TaskOutput to wait for background agents
+- Chain dependent tasks by waiting before launching
 
 ## Agent Prompt References
 

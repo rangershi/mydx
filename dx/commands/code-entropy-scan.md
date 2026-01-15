@@ -18,8 +18,8 @@ model: sonnet
 ```
 
 ### Options
-- `--codex`: 使用 codeagent-wrapper (Codex backend) 执行扫描和修复
-- `--gemini`: 使用 codeagent-wrapper (Gemini backend) 执行扫描和修复
+- `--codex`: 使用 Codex CLI 执行扫描和修复
+- `--gemini`: 使用 Gemini CLI 执行扫描和修复
 
 ---
 
@@ -30,8 +30,8 @@ model: sonnet
 | 参数 | 执行方式 | 适用场景 |
 |------|----------|----------|
 | （默认） | 直接执行（当前模型） | 大多数任务，避免 Telephone Game |
-| `--codex` | 委托 codeagent-wrapper (Codex) | 复杂任务、需要 Context Isolation |
-| `--gemini` | 委托 codeagent-wrapper (Gemini) | 需要 Gemini 模型能力 |
+| `--codex` | 委托 Codex CLI | 复杂任务、需要 Context Isolation |
+| `--gemini` | 委托 Gemini CLI | 需要 Gemini 模型能力 |
 
 ### 模式传递机制
 
@@ -42,11 +42,23 @@ model: sonnet
 
 2. 根据 `EXECUTION_MODE` 决定执行方式：
    - `direct`: 使用 Edit/Read/Grep 等工具直接执行扫描和修复
-   - `codex`/`gemini`: 委托给 `codeagent-wrapper --backend {mode}` 执行
+   - `codex`/`gemini`: 委托给对应 CLI 执行
 
-3. 委托执行时的 prompt 格式：
+3. 委托执行时的命令格式：
+
+   **Codex**:
+   ```bash
+   codex e -C . --skip-git-repo-check --json - <<'EOF'
+   执行代码降熵扫描第 N 阶段: {phase_description}
+   EOF
    ```
-   codeagent-wrapper --backend {mode} "执行代码降熵扫描第 N 阶段: {phase_description}"
+
+   **Gemini**:
+   ```bash
+   gemini -o stream-json -y -p "$(cat <<'EOF'
+   执行代码降熵扫描第 N 阶段: {phase_description}
+   EOF
+   )"
    ```
 
 ---
@@ -532,17 +544,29 @@ rg "process\.env\.DATABASE_URL" apps/backend/prisma/scripts apps/backend/*.ts
 1. 解析命令参数
 2. 确定 EXECUTION_MODE:
    - 无参数 → direct（直接执行）
-   - --codex → codex（Codex 后端）
-   - --gemini → gemini（Gemini 后端）
+   - --codex → codex（Codex CLI）
+   - --gemini → gemini（Gemini CLI）
 3. 根据模式选择执行方式
 ```
 
 **执行方式分支**：
 
 - **direct 模式**：使用 Edit/Read/Grep 等工具直接执行扫描和修复
-- **codex/gemini 模式**：委托给 codeagent-wrapper 执行
+- **codex/gemini 模式**：委托给对应 CLI 执行
+
+  **Codex**:
   ```bash
-  codeagent-wrapper --backend {mode} "执行代码降熵扫描: {task_description}"
+  codex e -C . --skip-git-repo-check --json - <<'EOF'
+  执行代码降熵扫描: {task_description}
+  EOF
+  ```
+
+  **Gemini**:
+  ```bash
+  gemini -o stream-json -y -p "$(cat <<'EOF'
+  执行代码降熵扫描: {task_description}
+  EOF
+  )"
   ```
 
 ### 阶段 1：执行扫描
@@ -550,7 +574,7 @@ rg "process\.env\.DATABASE_URL" apps/backend/prisma/scripts apps/backend/*.ts
 根据 `EXECUTION_MODE` 执行九项检查：
 
 **direct 模式**：直接使用下面的命令执行扫描
-**codex/gemini 模式**：将扫描任务委托给 codeagent-wrapper
+**codex/gemini 模式**：将扫描任务委托给对应 CLI 执行
 
 #### 1.1 E2E 中文测试名称扫描
 
@@ -907,17 +931,29 @@ apps/backend/src/modules/user/controllers/user.controller.ts:
 根据 `EXECUTION_MODE` 执行修复：
 
 **direct 模式**：使用 Edit 工具直接修改代码文件
-**codex/gemini 模式**：将修复任务委托给 codeagent-wrapper
+**codex/gemini 模式**：将修复任务委托给对应 CLI
 
+**Codex**:
 ```bash
-# codex/gemini 模式下的委托执行示例
-codeagent-wrapper --backend {mode} "
+codex e -C . --skip-git-repo-check --json - <<'EOF'
 执行代码降熵修复任务:
 - 修复范围: {selected_checks}
 - 扫描报告: {scan_report_summary}
 - 修复策略: 按照检查项说明执行修复
 - 验证要求: 修复后运行 lint 和受影响的测试
-"
+EOF
+```
+
+**Gemini**:
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+执行代码降熵修复任务:
+- 修复范围: {selected_checks}
+- 扫描报告: {scan_report_summary}
+- 修复策略: 按照检查项说明执行修复
+- 验证要求: 修复后运行 lint 和受影响的测试
+EOF
+)"
 ```
 
 #### 4.1 修复 E2E 中文测试名称
@@ -1229,7 +1265,7 @@ const databaseUrl = defaultEnvAccessor.str('DATABASE_URL')
 根据 `EXECUTION_MODE` 执行验证：
 
 **direct 模式**：直接使用 Bash 工具执行验证命令
-**codex/gemini 模式**：验证任务作为修复任务的一部分由 codeagent-wrapper 执行
+**codex/gemini 模式**：验证任务作为修复任务的一部分由对应 CLI 执行
 
 修复完成后：
 
@@ -1506,26 +1542,28 @@ E2E 重复实现       | 21       | 2        | 0
 建议使用 /git-commit-and-pr 提交代码
 ```
 
-### 示例 2：使用 Codex 后端
+### 示例 2：使用 Codex CLI
 
 ```
 用户：/code-entropy-scan --codex
 
 助手：
 检测到 EXECUTION_MODE: codex
-将使用 codeagent-wrapper (Codex backend) 执行扫描和修复
+将使用 Codex CLI 执行扫描和修复
 
 开始代码降熵扫描...
 
 执行命令：
-codeagent-wrapper --backend codex "执行代码降熵扫描，依次检查:
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+执行代码降熵扫描，依次检查:
 1. E2E 测试用例名称中文检查
 2. E2E 测试重复实现检查
 3. 分页 DTO 规范检查
 ...（共9项检查）
-输出结构化扫描报告"
+输出结构化扫描报告
+EOF
 
-[等待 Codex 后端执行完成]
+[等待 Codex CLI 执行完成]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -1543,12 +1581,14 @@ codeagent-wrapper --backend codex "执行代码降熵扫描，依次检查:
 
 助手：
 执行命令：
-codeagent-wrapper --backend codex "执行代码降熵修复任务:
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+执行代码降熵修复任务:
 - 修复范围: 全部 9 项检查
 - 修复策略: 按照检查项说明执行修复
-- 验证要求: 修复后运行 lint 和受影响的测试"
+- 验证要求: 修复后运行 lint 和受影响的测试
+EOF
 
-[等待 Codex 后端执行完成]
+[等待 Codex CLI 执行完成]
 
 ✅ 修复完成！
 
@@ -1557,24 +1597,27 @@ codeagent-wrapper --backend codex "执行代码降熵修复任务:
 建议使用 /git-commit-and-pr 提交代码
 ```
 
-### 示例 3：使用 Gemini 后端
+### 示例 3：使用 Gemini CLI
 
 ```
 用户：/code-entropy-scan --gemini
 
 助手：
 检测到 EXECUTION_MODE: gemini
-将使用 codeagent-wrapper (Gemini backend) 执行扫描和修复
+将使用 Gemini CLI 执行扫描和修复
 
 开始代码降熵扫描...
 
 执行命令：
-codeagent-wrapper --backend gemini "执行代码降熵扫描，依次检查:
+gemini -o stream-json -y -p "$(cat <<'EOF'
+执行代码降熵扫描，依次检查:
 1. E2E 测试用例名称中文检查
 2. E2E 测试重复实现检查
-...（共9项检查）"
+...（共9项检查）
+EOF
+)"
 
-[等待 Gemini 后端执行完成]
+[等待 Gemini CLI 执行完成]
 
 [后续流程与 Codex 模式类似]
 ```

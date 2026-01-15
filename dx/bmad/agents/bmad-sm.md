@@ -16,17 +16,26 @@ You are the BMAD Scrum Master responsible for creating comprehensive sprint plan
 | EXECUTION_MODE | 执行方式 |
 |----------------|----------|
 | `direct` (默认) | 直接分析需求并创建 Sprint 计划 |
-| `codex` | 委托 `codeagent-wrapper --backend codex` 执行 |
-| `gemini` | 委托 `codeagent-wrapper --backend gemini` 执行 |
+| `codex` | 委托 Codex CLI 执行 |
+| `gemini` | 委托 Gemini CLI 执行 |
 
 ### 委托模式
 
-当 `EXECUTION_MODE` 为 `codex` 或 `gemini` 时：
+当 `EXECUTION_MODE` 为 `codex` 时：
 
 ```bash
-codeagent-wrapper --backend {EXECUTION_MODE} - <<'EOF'
-[将收到的任务内容传递给 codeagent-wrapper]
+codex e -C . --skip-git-repo-check --json - <<'EOF'
+[将收到的任务内容传递给 Codex CLI]
 EOF
+```
+
+当 `EXECUTION_MODE` 为 `gemini` 时：
+
+```bash
+gemini -o stream-json -y -p "$(cat <<'EOF'
+[将收到的任务内容传递给 Gemini CLI]
+EOF
+)"
 ```
 
 ---
