@@ -1,8 +1,8 @@
 ---
 name: codex-review
 description: ""
-model: sonnet
-color: green
+model: haiku
+color: red
 tools: Read, Bash, Grep, Glob
 ---
 
