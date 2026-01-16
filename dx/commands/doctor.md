@@ -32,10 +32,12 @@ grep '"statusLine"' ~/.claude/settings.json 2>/dev/null || echo "NOT_CONFIGURED"
 ```
 
 ```bash
-# 4. CLI 多版本检测
-echo "=== npm ===" && npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none"
-echo "=== pnpm ===" && pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none"
-echo "=== brew ===" && brew list claude 2>/dev/null || echo "none"
+# 4. CLI 多版本检测（claude/codex）
+echo "=== claude / npm ===" && npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none"
+echo "=== claude / pnpm ===" && pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none"
+echo "=== claude / brew ===" && brew list claude 2>/dev/null || echo "none"
+echo "=== codex / npm ===" && npm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none"
+echo "=== codex / pnpm ===" && pnpm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none"
 ```
 
 ```bash
@@ -95,13 +97,28 @@ Edit `~/.claude/settings.json` 添加：
 
 ### 3.5 CLI 多版本
 
-`AskUserQuestion`: 保留哪个包管理器？
+如检测到多版本，**仅保留 pnpm 安装**（claude/codex）。
 
 卸载其他版本：
 ```bash
-npm uninstall -g @anthropic-ai/claude-code    # 如选择移除 npm
-pnpm remove -g @anthropic-ai/claude-code      # 如选择移除 pnpm
-brew uninstall claude                          # 如选择移除 brew
+# claude
+npm uninstall -g @anthropic-ai/claude-code
+brew uninstall claude
+
+# codex
+npm uninstall -g @openai/codex
+```
+
+### 3.6 更新到最新版本
+
+```bash
+pnpm install -g @anthropic-ai/claude-code@latest
+pnpm install -g @openai/codex@latest
+```
+
+验证：
+```bash
+claude --version && codex --version
 ```
 
 ---
