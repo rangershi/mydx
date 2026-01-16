@@ -45,6 +45,11 @@ echo "=== codex / pnpm ===" && pnpm list -g @openai/codex 2>/dev/null | grep @op
 grep 'ENABLE_LSP_TOOLS' ~/.claude/settings.json 2>/dev/null || echo "NOT_CONFIGURED"
 ```
 
+```bash
+# 6. 插件自动更新配置
+grep 'FORCE_AUTOUPDATE_PLUGINS' ~/.claude/settings.json 2>/dev/null || echo "NOT_CONFIGURED"
+```
+
 ---
 
 ## Step 2: 输出报告
@@ -57,6 +62,7 @@ codex              | <状态>   | <版本>
 gemini             | <状态>   | <版本>
 ccstatusline       | <状态>   | -
 LSP 服务           | <状态>   | -
+插件自动更新       | <状态>   | -
 ```
 
 多版本警告（如有）：列出各包管理器的安装情况。
@@ -95,30 +101,40 @@ Edit `~/.claude/settings.json` 添加：
 "env": { "ENABLE_LSP_TOOLS": "1" }
 ```
 
-### 3.5 CLI 多版本
+### 3.5 CLI 多版本处理
 
-如检测到多版本，**仅保留 pnpm 安装**（claude/codex）。
+**如检测到多版本，立即执行卸载（仅保留 pnpm）：**
 
-卸载其他版本：
 ```bash
-# claude
-npm uninstall -g @anthropic-ai/claude-code
-brew uninstall claude
+# 卸载 npm 版本
+npm uninstall -g @anthropic-ai/claude-code 2>/dev/null
+npm uninstall -g @openai/codex 2>/dev/null
 
-# codex
-npm uninstall -g @openai/codex
+# 卸载 brew 版本
+brew uninstall claude 2>/dev/null
 ```
 
 ### 3.6 更新到最新版本
 
+**立即执行更新：**
+
 ```bash
-pnpm install -g @anthropic-ai/claude-code@latest
-pnpm install -g @openai/codex@latest
+pnpm install -g @anthropic-ai/claude-code@latest @openai/codex@latest
 ```
 
-验证：
+**验证安装结果：**
+
 ```bash
 claude --version && codex --version
+```
+
+### 3.7 插件自动更新未配置
+
+**如未配置 FORCE_AUTOUPDATE_PLUGINS，立即启用：**
+
+Edit `~/.claude/settings.json` 在 `env` 对象中添加：
+```json
+"FORCE_AUTOUPDATE_PLUGINS": "1"
 ```
 
 ---
