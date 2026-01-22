@@ -87,6 +87,11 @@ grep -q '"opencode-openai-codex-auth"' ~/.config/opencode/opencode.json 2>/dev/n
 grep 'FORCE_AUTOUPDATE_PLUGINS' ~/.claude/settings.json 2>/dev/null || echo "NOT_CONFIGURED"
 ```
 
+```bash
+# 14. agent-browser CLI
+which agent-browser && agent-browser --version 2>/dev/null || echo "NOT_FOUND"
+```
+
 ---
 
 ## Step 2: 输出报告
@@ -107,6 +112,7 @@ opencode-openai-codex-auth     | <状态>   | -
 ccstatusline                   | <状态>   | -
 LSP 服务                       | <状态>   | -
 插件自动更新                   | <状态>   | -
+agent-browser                  | <状态>   | <版本>
 ```
 
 多版本警告（如有）：列出各包管理器的安装情况。
@@ -256,6 +262,13 @@ claude --version && codex --version
 ```json
 Edit ~/.claude/settings.json 在 env 对象中添加：
 "FORCE_AUTOUPDATE_PLUGINS": "1"
+```
+
+### 3.13 agent-browser 未安装
+
+执行安装：
+```bash
+npm install -g @anthropic-ai/agent-browser
 ```
 
 ---

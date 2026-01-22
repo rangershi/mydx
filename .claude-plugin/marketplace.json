@@ -78,7 +78,8 @@
         "./skills/codex-cli/SKILL.md",
         "./skills/gemini-cli/SKILL.md",
         "./skills/product-requirements/SKILL.md",
-        "./skills/omo/SKILL.md"
+        "./skills/omo/SKILL.md",
+        "./skills/agent-browser/SKILL.md"
       ],
       "hooks": "./hooks/hooks.json"
     }
