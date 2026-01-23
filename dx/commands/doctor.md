@@ -1,5 +1,5 @@
 ---
-allowed-tools: [Bash, AskUserQuestion, Edit, Read]
+allowed-tools: [Bash, AskUserQuestion, Edit, Read, Write]
 description: '环境诊断：检测 Codex CLI、Gemini CLI 及其他依赖'
 model: haiku
 ---
@@ -30,24 +30,26 @@ echo "agent-browser:" && (which agent-browser && agent-browser --version 2>/dev/
 echo "=== PROJECT_FILES ==="
 echo "AGENTS.md:" && (test -f AGENTS.md && echo "FOUND" || echo "NOT_FOUND")
 echo "opencode.json:" && (test -f opencode.json && echo "CONFIGURED" || echo "NOT_FOUND")
-echo "instructions:" && (if [ -f opencode.json ]; then grep -q '"AGENTS.md"' opencode.json && grep -q '"ruler/\*\*/\*.md"' opencode.json && echo "VALID" || echo "INVALID"; else echo "SKIP"; fi)
+echo "instructions:" && (if [ -f opencode.json ]; then grep -q '"AGENTS.md"' opencode.json && grep -q '"ruler/' opencode.json && echo "VALID" || echo "INVALID"; else echo "SKIP"; fi)
 ```
 
 ```bash
 # 批次 3: Claude 配置 + OpenCode 插件检测
+# 注意：插件名可能带版本号（如 @1.3.0），使用模糊匹配
 echo "=== CLAUDE_CONFIG ==="
 echo "statusLine:" && (grep '"statusLine"' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
 echo "LSP:" && (grep 'ENABLE_LSP_TOOLS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
 echo "autoUpdate:" && (grep 'FORCE_AUTOUPDATE_PLUGINS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
 echo "=== OPENCODE_PLUGINS ==="
-echo "oh-my-opencode:" && (grep -q '"oh-my-opencode"' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
-echo "opencode-antigravity-auth:" && (grep -q '"opencode-antigravity-auth"' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
-echo "opencode-openai-codex-auth:" && (grep -q '"opencode-openai-codex-auth"' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
+echo "oh-my-opencode:" && (grep -q 'oh-my-opencode' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
+echo "opencode-antigravity-auth:" && (grep -q 'opencode-antigravity-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
+echo "opencode-openai-codex-auth:" && (grep -q 'opencode-openai-codex-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
 ```
 
 ```bash
 # 批次 4: CLI 多版本检测
 echo "=== MULTI_VERSION ==="
+echo "claude/native:" && (test -x ~/.local/bin/claude && ~/.local/bin/claude --version 2>/dev/null || echo "none")
 echo "claude/npm:" && (npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none")
 echo "claude/pnpm:" && (pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none")
 echo "claude/brew:" && (brew list claude 2>/dev/null || echo "none")
@@ -118,7 +120,10 @@ brew install opencode || npm install -g opencode
 
 ### 3.5 opencode.json 未配置
 
-立即创建配置文件：
+使用 Write 工具创建配置文件：
+
+文件路径：`<项目根目录>/opencode.json`
+
 ```json
 {
   "$schema": "https://opencode.ai/config.json",
@@ -131,101 +136,100 @@ brew install opencode || npm install -g opencode
 
 ### 3.6 配置指令无效
 
-立即修复 opencode.json：
+使用 Edit 工具修复 opencode.json，确保包含：
+- `"AGENTS.md"`: 主配置文件
+- `"ruler/**/*.md"`: 自动加载 ruler 目录下所有 .md 文件（因 OpenCode 不支持 @ 引用）
+
+### 3.7 OpenCode 插件安装
+
+**OpenCode 插件通过编辑 `~/.config/opencode/opencode.json` 的 `plugin` 数组安装。**
+
+1. 先读取现有配置：
+```bash
+cat ~/.config/opencode/opencode.json
+```
+
+2. 使用 Edit 工具在 `plugin` 数组中添加缺失的插件：
+   - `oh-my-opencode`
+   - `opencode-antigravity-auth@latest`
+   - `opencode-openai-codex-auth`
+
+示例 plugin 配置：
 ```json
-{
-  "$schema": "https://opencode.ai/config.json",
-  "instructions": [
-    "AGENTS.md",
-    "ruler/**/*.md"
-  ]
-}
+"plugin": [
+  "oh-my-opencode",
+  "opencode-antigravity-auth@latest",
+  "opencode-openai-codex-auth"
+]
 ```
 
-说明：
-- `AGENTS.md`: 主配置文件
-- `ruler/**/*.md`: 自动加载 ruler 目录下所有 .md 文件（因 OpenCode 不支持 @ 引用）
-
-### 3.7 OpenCode 插件批量安装
-
-**自动安装所有缺失的 OpenCode 插件：**
-
+3. 验证安装：
 ```bash
-# 依次获取并执行安装文档
-```
-
-**oh-my-opencode:**
-```
-WebFetch: https://raw.githubusercontent.com/code-yeongyu/oh-my-opencode/refs/heads/master/docs/guide/installation.md
-prompt: "Read the installation guide and execute all installation steps automatically"
-```
-
-**opencode-antigravity-auth:**
-```
-WebFetch: https://raw.githubusercontent.com/NoeFabris/opencode-antigravity-auth/main/README.md
-prompt: "Read the installation guide and execute all installation steps automatically"
-```
-
-**opencode-openai-codex-auth:**
-```
-WebFetch: https://raw.githubusercontent.com/numman-ali/opencode-openai-codex-auth/main/README.md
-prompt: "Read the installation guide and execute all installation steps automatically"
-```
-
-验证所有插件安装：
-```bash
-grep -E '"oh-my-opencode"|"opencode-antigravity-auth"|"opencode-openai-codex-auth"' ~/.config/opencode/opencode.json
+grep -E 'oh-my-opencode|opencode-antigravity-auth|opencode-openai-codex-auth' ~/.config/opencode/opencode.json
 ```
 
 ### 3.8 ccstatusline 未配置
 
-立即配置（npx 优先）：
+使用 Edit 工具修改 `~/.claude/settings.json`，添加：
 ```json
-Edit ~/.claude/settings.json 添加：
 "statusLine": "npx ccstatusline@latest"
 ```
 
 ### 3.9 LSP 未配置
 
-立即启用：
+使用 Edit 工具修改 `~/.claude/settings.json`，在 `env` 对象中添加：
 ```json
-Edit ~/.claude/settings.json 添加：
-"env": { "ENABLE_LSP_TOOLS": "1" }
+"ENABLE_LSP_TOOLS": "1"
 ```
 
-### 3.10 CLI 多版本处理
+### 3.10 Claude CLI 版本管理
 
-**如检测到多版本，立即执行卸载（仅保留 pnpm）：**
+**策略：仅保留 `~/.local/bin/claude` 原生版本，卸载其他所有安装方式。**
+
+**如检测到非原生版本，立即执行卸载：**
 
 ```bash
 # 卸载 npm 版本
 npm uninstall -g @anthropic-ai/claude-code 2>/dev/null
-npm uninstall -g @openai/codex 2>/dev/null
+
+# 卸载 pnpm 版本
+pnpm uninstall -g @anthropic-ai/claude-code 2>/dev/null
 
 # 卸载 brew 版本
 brew uninstall claude 2>/dev/null
 ```
 
-### 3.11 更新到最新版本
-
-**立即执行更新：**
+**如原生版本不存在，安装原生版本：**
 
 ```bash
-pnpm install -g @anthropic-ai/claude-code@latest @openai/codex@latest
+curl -fsSL https://claude.ai/install.sh | sh
+```
+
+**验证结果：**
+
+```bash
+~/.local/bin/claude --version
+```
+
+### 3.11 Codex CLI 版本管理
+
+**如检测到 npm 版本，卸载并统一使用 pnpm：**
+
+```bash
+npm uninstall -g @openai/codex 2>/dev/null
+pnpm install -g @openai/codex@latest
 ```
 
 **验证安装结果：**
 
 ```bash
-claude --version && codex --version
+codex --version
 ```
 
 ### 3.12 插件自动更新未配置
 
-**立即启用：**
-
+使用 Edit 工具修改 `~/.claude/settings.json`，在 `env` 对象中添加：
 ```json
-Edit ~/.claude/settings.json 在 env 对象中添加：
 "FORCE_AUTOUPDATE_PLUGINS": "1"
 ```
 
@@ -249,3 +253,6 @@ npm install -g agent-browser && agent-browser install
 ```
 ⚠️ <工具> 未安装/未配置
 ```
+
+**修复完成后：**
+输出最终状态表格，确认所有项目均为 ✅
