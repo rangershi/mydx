@@ -1269,14 +1269,14 @@ const databaseUrl = defaultEnvAccessor.str('DATABASE_URL')
 
 修复完成后：
 
-1. 执行 `./scripts/dx lint` 检查代码风格
-2. 执行 `./scripts/dx build backend` 验证编译
+1. 执行 `dx lint` 检查代码风格
+2. 执行 `dx build backend` 验证编译
 3. 运行受影响的 E2E 测试：
    ```bash
    # 对每个修改的测试文件
-   ./scripts/dx test e2e backend <modified-test-file>
+   dx test e2e backend <modified-test-file>
    ```
-4. 如果是分页 DTO 修复，执行 `./scripts/dx build sdk` 更新 SDK
+4. 如果是分页 DTO 修复，执行 `dx build sdk` 更新 SDK
 5. 针对环境变量访问改动，运行对应模块的单元/集成测试（如 Chat/Payment 模块）并核对 `.env.*` 示例文件
 6. 针对错误处理改动，运行对应模块的 API/E2E 冒烟用例，确认响应 `error.code` 与 `args` 与预期一致，并检查日志是否生成 requestId
 7. 生成验证报告
@@ -1354,10 +1354,10 @@ E2E 重复实现       | 21       | 2        | 0
 ## Delegation
 
 - **翻译服务**：对于中文测试名称，可使用 Web Search 查询专业翻译或调用 AI 模型
-- **测试执行**：通过 `./scripts/dx test e2e backend <file>` 验证修复
+- **测试执行**：通过 `dx test e2e backend <file>` 验证修复
 - **环境配置校验**：必要时调用 `defaultEnvAccessor`/`EnvService` 辅助函数，或编写临时脚本校验配置读取结果
 - **异常审查**：参考 `apps/backend/src/common/exceptions` 与 `@ai/shared/constants/error-codes.ts`，确保新异常和错误码同步
-- **代码格式化**：通过 `./scripts/dx lint` 自动修复格式问题
+- **代码格式化**：通过 `dx lint` 自动修复格式问题
 
 ## 输出约定
 
@@ -1438,15 +1438,15 @@ E2E 重复实现       | 21       | 2        | 0
 ### 测试验证约束
 
 - E2E 测试修复后必须逐个运行相关测试文件
-- 分页 DTO 修复后必须运行 `./scripts/dx build sdk`
+- 分页 DTO 修复后必须运行 `dx build sdk`
 - 任何测试失败需回滚该文件的修复
 - 环境变量访问修复后需执行至少一个受影响模块的集成测试或功能冒烟测试
 - 错误处理修复后需调用对应 API/E2E 用例，确认响应结构与日志 requestId
 
 ### 质量门禁
 
-- 修复后必须通过 `./scripts/dx lint`
-- 修复后必须通过 `./scripts/dx build backend`
+- 修复后必须通过 `dx lint`
+- 修复后必须通过 `dx build backend`
 - 受影响的 E2E 测试必须全部通过
 - 如涉及环境变量，需同步更新 `.env.example`/`.env.*` 模板并通过评审
 - 涉及错误处理的改动需补充/更新异常类单测，确保 `code/status/args` 一致
