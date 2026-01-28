@@ -18,45 +18,45 @@ model: haiku
 
 ```bash
 # 批次 1: CLI 版本检测
-echo "=== CLI_VERSIONS ==="
-echo "codex:" && (which codex && codex --version 2>/dev/null || echo "NOT_FOUND")
-echo "gemini:" && (which gemini && gemini --version 2>/dev/null || echo "NOT_FOUND")
-echo "opencode:" && (which opencode && opencode --version 2>/dev/null || echo "NOT_FOUND")
-echo "agent-browser:" && (which agent-browser && agent-browser --version 2>/dev/null || echo "NOT_FOUND")
+echo "=== CLI_VERSIONS ===";
+echo "codex:" && (which codex && codex --version 2>/dev/null || echo "NOT_FOUND");
+echo "gemini:" && (which gemini && gemini --version 2>/dev/null || echo "NOT_FOUND");
+echo "opencode:" && (which opencode && opencode --version 2>/dev/null || echo "NOT_FOUND");
+echo "agent-browser:" && (which agent-browser && agent-browser --version 2>/dev/null || echo "NOT_FOUND");
 ```
 
 ```bash
 # 批次 2: 项目文件检测
-echo "=== PROJECT_FILES ==="
-echo "AGENTS.md:" && (test -f AGENTS.md && echo "FOUND" || echo "NOT_FOUND")
-echo "opencode.json:" && (test -f opencode.json && echo "CONFIGURED" || echo "NOT_FOUND")
-echo "instructions:" && (if [ -f opencode.json ]; then grep -q '"AGENTS.md"' opencode.json && grep -q '"ruler/' opencode.json && echo "VALID" || echo "INVALID"; else echo "SKIP"; fi)
+echo "=== PROJECT_FILES ===";
+echo "AGENTS.md:" && (test -f AGENTS.md && echo "FOUND" || echo "NOT_FOUND");
+echo "opencode.json:" && (test -f opencode.json && echo "CONFIGURED" || echo "NOT_FOUND");
+echo "instructions:" && (if [ -f opencode.json ]; then grep -q '"AGENTS.md"' opencode.json && grep -q '"ruler/' opencode.json && echo "VALID" || echo "INVALID"; else echo "SKIP"; fi);
 ```
 
 ```bash
 # 批次 3: Claude 配置 + OpenCode 插件检测
 # 注意：插件名可能带版本号（如 @1.3.0），使用模糊匹配
-echo "=== CLAUDE_CONFIG ==="
-echo "statusLine:" && (grep '"statusLine"' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
-echo "LSP:" && (grep 'ENABLE_LSP_TOOLS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
-echo "autoUpdate:" && (grep 'FORCE_AUTOUPDATE_PLUGINS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED")
-echo "=== OPENCODE_PLUGINS ==="
-echo "oh-my-opencode:" && (grep -q 'oh-my-opencode' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
-echo "opencode-antigravity-auth:" && (grep -q 'opencode-antigravity-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
-echo "opencode-openai-codex-auth:" && (grep -q 'opencode-openai-codex-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED")
+echo "=== CLAUDE_CONFIG ===";
+echo "statusLine:" && (grep '"statusLine"' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED");
+echo "LSP:" && (grep 'ENABLE_LSP_TOOLS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED");
+echo "autoUpdate:" && (grep 'FORCE_AUTOUPDATE_PLUGINS' ~/.claude/settings.json 2>/dev/null && echo "CONFIGURED" || echo "NOT_CONFIGURED");
+echo "=== OPENCODE_PLUGINS ===";
+echo "oh-my-opencode:" && (grep -q 'oh-my-opencode' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED");
+echo "opencode-antigravity-auth:" && (grep -q 'opencode-antigravity-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED");
+echo "opencode-openai-codex-auth:" && (grep -q 'opencode-openai-codex-auth' ~/.config/opencode/opencode.json 2>/dev/null && echo "INSTALLED" || echo "NOT_INSTALLED");
 ```
 
 ```bash
 # 批次 4: CLI 多版本检测
-echo "=== MULTI_VERSION ==="
-echo "claude/native:" && (test -x ~/.local/bin/claude && ~/.local/bin/claude --version 2>/dev/null || echo "none")
-echo "claude/npm:" && (npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none")
-echo "claude/pnpm:" && (pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none")
-echo "claude/brew:" && (brew list claude 2>/dev/null || echo "none")
-echo "codex/npm:" && (npm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none")
-echo "codex/pnpm:" && (pnpm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none")
-echo "opencode/npm:" && (npm list -g opencode 2>/dev/null | grep opencode || echo "none")
-echo "opencode/brew:" && (brew list opencode 2>/dev/null || echo "none")
+echo "=== MULTI_VERSION ===";
+echo "claude/native:" && (test -x ~/.local/bin/claude && ~/.local/bin/claude --version 2>/dev/null || echo "none");
+echo "claude/npm:" && (npm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none");
+echo "claude/pnpm:" && (pnpm list -g @anthropic-ai/claude-code 2>/dev/null | grep claude-code || echo "none");
+echo "claude/brew:" && (brew list claude 2>/dev/null || echo "none");
+echo "codex/npm:" && (npm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none");
+echo "codex/pnpm:" && (pnpm list -g @openai/codex 2>/dev/null | grep @openai/codex || echo "none");
+echo "opencode/npm:" && (npm list -g opencode 2>/dev/null | grep opencode || echo "none");
+echo "opencode/brew:" && (brew list opencode 2>/dev/null || echo "none");
 ```
 
 ---

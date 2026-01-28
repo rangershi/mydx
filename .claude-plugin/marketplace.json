@@ -7,7 +7,7 @@
   },
   "metadata": {
     "description": "Developer Experience toolkit with development workflows, code review, PR automation, and AI-assisted agents",
-    "version": "1.0.14"
+    "version": "1.0.15"
   },
   "plugins": [
     {
