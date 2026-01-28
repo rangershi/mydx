@@ -12,6 +12,16 @@ model: haiku
 
 ---
 
+## Step 0: 强制安装 dx CLI
+
+**无论当前是否安装，必须执行：**
+
+```bash
+pnpm i -g @ranger1/dx
+```
+
+---
+
 ## Step 1: 并行检测
 
 **同时执行以下 4 个 Bash 调用（真正并行）：**
@@ -114,20 +124,13 @@ agent-browser                  | <状态>   | <版本>
 brew install opencode || npm install -g opencode
 ```
 
-### 3.4 dx CLI 未安装
-
-执行安装：
-```bash
-pnpm i -g @ranger1/dx
-```
-
-### 3.5 AGENTS.md 未找到
+### 3.4 AGENTS.md 未找到
 
 提示用户：
 - AGENTS.md 文件不存在，OpenCode 需要此文件作为项目指令入口
 - 建议创建或检查文件路径
 
-### 3.6 opencode.json 未配置
+### 3.5 opencode.json 未配置
 
 使用 Write 工具创建配置文件：
 
@@ -143,13 +146,13 @@ pnpm i -g @ranger1/dx
 }
 ```
 
-### 3.7 配置指令无效
+### 3.6 配置指令无效
 
 使用 Edit 工具修复 opencode.json，确保包含：
 - `"AGENTS.md"`: 主配置文件
 - `"ruler/**/*.md"`: 自动加载 ruler 目录下所有 .md 文件（因 OpenCode 不支持 @ 引用）
 
-### 3.8 OpenCode 插件安装
+### 3.7 OpenCode 插件安装
 
 **OpenCode 插件通过编辑 `~/.config/opencode/opencode.json` 的 `plugin` 数组安装。**
 
@@ -177,21 +180,21 @@ cat ~/.config/opencode/opencode.json
 grep -E 'oh-my-opencode|opencode-antigravity-auth|opencode-openai-codex-auth' ~/.config/opencode/opencode.json
 ```
 
-### 3.9 ccstatusline 未配置
+### 3.8 ccstatusline 未配置
 
 使用 Edit 工具修改 `~/.claude/settings.json`，添加：
 ```json
 "statusLine": "npx ccstatusline@latest"
 ```
 
-### 3.10 LSP 未配置
+### 3.9 LSP 未配置
 
 使用 Edit 工具修改 `~/.claude/settings.json`，在 `env` 对象中添加：
 ```json
 "ENABLE_LSP_TOOLS": "1"
 ```
 
-### 3.11 Claude CLI 版本管理
+### 3.10 Claude CLI 版本管理
 
 **策略：仅保留 `~/.local/bin/claude` 原生版本，卸载其他所有安装方式。**
 
@@ -220,7 +223,7 @@ curl -fsSL https://claude.ai/install.sh | sh
 ~/.local/bin/claude --version
 ```
 
-### 3.12 Codex CLI 版本管理
+### 3.11 Codex CLI 版本管理
 
 **如检测到 npm 版本，卸载并统一使用 pnpm：**
 
@@ -235,14 +238,14 @@ pnpm install -g @openai/codex@latest
 codex --version
 ```
 
-### 3.13 插件自动更新未配置
+### 3.12 插件自动更新未配置
 
 使用 Edit 工具修改 `~/.claude/settings.json`，在 `env` 对象中添加：
 ```json
 "FORCE_AUTOUPDATE_PLUGINS": "1"
 ```
 
-### 3.14 agent-browser 未安装
+### 3.13 agent-browser 未安装
 
 执行安装：
 ```bash
