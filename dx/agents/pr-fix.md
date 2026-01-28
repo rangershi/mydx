@@ -230,5 +230,5 @@ interface FixResult {
 
 ## 明确禁止
 
-- ⛔ 不支持 `nocodex` 或任何“直接修复”模式
+ - ⛔ 不支持任何“直接修复”模式
 - ⛔ 不要自行修复代码；只负责构造/发起 Codex CLI 调用并返回结果 JSON

@@ -11,9 +11,6 @@ description: '多轮 PR 评审与自动修复编排流程'
 
 # 显式指定 PR
 /pr-review-loop --pr <PR_NUMBER>
-
-# nocodex 模式（pr-fix 直接修复，不委托 Codex CLI）
-/pr-review-loop --nocodex
 ```
 
 **优先级修复策略**：
@@ -125,7 +122,6 @@ description: '多轮 PR 评审与自动修复编排流程'
 ```bash
 # 解析参数
 --pr <PR_NUMBER>  → 使用指定 PR
---nocodex         → 设置 USE_NOCODEX = true
 
 # 若无 --pr，自动识别
 git branch --show-current
@@ -138,7 +134,6 @@ gh pr list --head <BRANCH> --json number,title,url
 ```
 ROUND = 1
 MAX_ROUNDS = 3
-USE_NOCODEX = false (or true)
 REVIEW_HISTORY = []
 ```
 
@@ -341,8 +336,6 @@ fixPayload = {
   prompt: `
 请修复 PR #${PR_NUMBER} 中的评审问题。
 
-${USE_NOCODEX ? "nocodex" : ""}
-
 ## 问题列表
 ${JSON.stringify(fixPayload, null, 2)}
 
@@ -537,7 +530,6 @@ flowchart TD
 | **P0/P1/P2 修复** | 必须处理所有问题，禁止跳过 |
 | **修复验证** | fixedIssues + rejectedIssues = issuesToFix |
 | **循环控制** | P0/P1/P2 = 0 才能退出，最多 3 轮 |
-| **nocodex 模式** | 参数传递给 pr-fix，直接执行修复 |
 
 ---
 

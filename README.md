@@ -149,7 +149,6 @@ git clone https://github.com/rangershi/mydx.git .claude-plugin/mydx
 | 参数 | 说明 |
 |------|------|
 | (默认) | 使用 Codex CLI 执行代码修复 |
-| `--nocodex` | 使用 Claude 当前模型直接执行修复 |
 
 **示例**：
 
@@ -157,13 +156,8 @@ git clone https://github.com/rangershi/mydx.git .claude-plugin/mydx
 # 默认模式：使用 Codex 修复（推荐，适合复杂问题）
 /dx:pr-review-loop
 
-# nocodex 模式：使用 Claude 直接修复
-# 适合简单问题，可减少 token 消耗约 15 倍
-/dx:pr-review-loop --nocodex
-
 # 指定 PR 编号
 /dx:pr-review-loop --pr 123
-/dx:pr-review-loop --pr 123 --nocodex
 ```
 
 ### 技术咨询 (`/dx:ask`) - 多后端并行分析
